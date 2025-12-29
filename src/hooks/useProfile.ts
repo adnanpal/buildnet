@@ -53,18 +53,25 @@ export function useProfile(appUserId: number | null) {
                 setLoading(true);
 
                 const res = await api.get(
-                    `/api/authors?filters[user][id][$eq]=${appUserId}&populate=*`
+                    `/api/authors?filters[user][$eq]=${appUserId}&populate=*`
                 );
 
-                if (res.data.data.length) {
+                const data = res.data?.data;
+
+                // 🟢 NO PROFILE YET
+                if (!data || data.length === 0) {
                     setEditMode(false);
                     setAuthorId(null);
                     setIsHydrated(true);
                     return;
                 }
 
-                const author = res.data.data[0];
-                const data = author.attributes;
+                // 🟢 PROFILE EXISTS
+                const author = data[0];
+
+                setAuthorId(author.id);
+                setEditMode(true);
+
 
 
                 setEditMode(true);

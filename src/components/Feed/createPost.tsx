@@ -1,9 +1,36 @@
 import { useState, useEffect } from "react";
 import { usePost } from "../../hooks/usePost";
 import { Lightbulb, X, Plus, Sparkles, Users, FileText, Tag, Layers, CheckCircle } from 'lucide-react';
+import { useUser } from "@clerk/clerk-react";
+import api from "../../api/axios";
 
 export default function CreatePost() {
   const { createPost } = usePost();
+  const [authorId, setAuthorId] = useState<number | null>(null);
+
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchAuthor = async () => {
+      try {
+        const res = await api.get(
+          `/api/authors?filters[user][clerkUserId][$eq]=${user.id}`
+        );
+
+        const data = res.data?.data;
+
+        if (data && data.length > 0) {
+          setAuthorId(data[0].id);
+        }
+      } catch (err) {
+        console.error("Failed to fetch author", err);
+      }
+    };
+
+    fetchAuthor();
+  }, [user]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -57,15 +84,7 @@ export default function CreatePost() {
     setFormData({ ...formData, seekingRoles: formData.seekingRoles.filter(role => role !== roleToRemove) });
   };
 
-  const [authorId, setAuthorId] = useState<number | null>(null);
-
   // ✅ Load authorId from localStorage
-  useEffect(() => {
-    const storedAuthorId = localStorage.getItem("authorId");
-    if (storedAuthorId) {
-      setAuthorId(Number(storedAuthorId));
-    }
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -239,7 +258,7 @@ export default function CreatePost() {
                 <Tag className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                 Technology Tags *
               </label>
-              
+
               {/* Tag Input */}
               <div className="flex flex-col sm:flex-row gap-2 mb-3 sm:mb-4">
                 <input
@@ -270,11 +289,10 @@ export default function CreatePost() {
                       type="button"
                       onClick={() => handleAddTag(tag)}
                       disabled={formData.tags.includes(tag)}
-                      className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition ${
-                        formData.tags.includes(tag)
+                      className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition ${formData.tags.includes(tag)
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                           : 'bg-purple-50 text-purple-700 hover:bg-purple-100 active:scale-95'
-                      }`}
+                        }`}
                     >
                       {tag}
                     </button>
@@ -310,7 +328,7 @@ export default function CreatePost() {
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                 Seeking Collaborators
               </label>
-              
+
               {/* Role Input */}
               <div className="flex flex-col sm:flex-row gap-2 mb-3 sm:mb-4">
                 <input
@@ -341,11 +359,10 @@ export default function CreatePost() {
                       type="button"
                       onClick={() => handleAddRole(role)}
                       disabled={formData.seekingRoles.includes(role)}
-                      className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition ${
-                        formData.seekingRoles.includes(role)
+                      className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition ${formData.seekingRoles.includes(role)
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                           : 'bg-blue-50 text-blue-700 hover:bg-blue-100 active:scale-95'
-                      }`}
+                        }`}
                     >
                       {role}
                     </button>
@@ -387,11 +404,10 @@ export default function CreatePost() {
                     key={option.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, statuss: option.value })}
-                    className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all active:scale-95 ${
-                      formData.statuss === option.value
+                    className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all active:scale-95 ${formData.statuss === option.value
                         ? 'border-purple-600 bg-purple-50 shadow-lg'
                         : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
                       <div className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full ${option.color}`}></div>
