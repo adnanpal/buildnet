@@ -72,11 +72,6 @@ export function useProfile(appUserId: number | null) {
                 setAuthorId(author.id);
                 setEditMode(true);
 
-
-
-                setEditMode(true);
-                setAuthorId(author.id);
-
                 /*const hydrated = {
                     fullName: data.name || "",
                     username: user.username || "",

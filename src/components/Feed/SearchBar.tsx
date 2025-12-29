@@ -1,12 +1,14 @@
 import { Filter, Search } from "lucide-react";
 import { useState } from "react";
+
 interface onFilterChangeProps {
   onFilterChange: (value: string) => void;
+  onSearch: (value: string) => void;
 }
-export function SearchBar({ }: onFilterChangeProps) {
-
+export function SearchBar({onSearch}: onFilterChangeProps) {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+
 
   return (
     <div className="lg:col-span-2">
@@ -16,7 +18,8 @@ export function SearchBar({ }: onFilterChangeProps) {
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
-              type="text"
+              onChange={(e) => onSearch(e.target.value)} 
+              type="text"              
               placeholder="Search projects, ideas, or collaborators..."
               className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-transparent focus:border-purple-400 focus:outline-none transition bg-white/50"
             />

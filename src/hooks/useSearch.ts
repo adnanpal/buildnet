@@ -1,10 +1,11 @@
 import { useState } from "react";
+import api from "../api/axios";
 
-export function useSearch(apiUrl:string) {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState("");
+export function useSearch<T = any>(apiUrl: string) {
+  const [data, setData] = useState<T | null>(null);
+  const [error, setError] = useState<string>("");
 
-  const search = async (value:string) => {
+  const search = async (value: string) => {
     if (!value.trim()) {
       setData(null);
       setError("");
@@ -12,19 +13,17 @@ export function useSearch(apiUrl:string) {
     }
 
     try {
-      const res = await fetch(apiUrl + value);
+      const res = await api.get(`${apiUrl}${value}`);
 
-      if (!res.ok) {
+      setData(res.data);
+      setError("");
+    } catch (err: any) {
+      if (err.response?.status === 404) {
         setData(null);
         setError("Not found");
-        return;
+      } else {
+        setError("Server error");
       }
-
-      const json = await res.json();
-      setData(json);
-      setError("");
-    } catch {
-      setError("Server error");
     }
   };
 
@@ -33,5 +32,10 @@ export function useSearch(apiUrl:string) {
     setError("");
   };
 
-  return { data, error, search, reset };
+  return {
+    data,
+    error,
+    search,
+    reset,
+  };
 }

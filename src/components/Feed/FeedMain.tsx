@@ -1,95 +1,76 @@
-import { useEffect, useState } from 'react';
 import FeedNavbar from './FeedNavbar';
 import { SearchBar } from './SearchBar';
 import { PostCard } from './PostCard';
 import { FeedSidebar } from './FeedSidebar';
 import Footer from '../Footer';
-import type { Post } from './PostCard';
-import api from '../../api/axios';
+import useFetch from "../../hooks/useFetch";
+import { useSearch } from '../../hooks/useSearch';
+import { useEffect } from 'react';
 
 export default function FeedMain() {
+  const {
+    posts,
+    handleVote,
+    setPosts,
+    handleBookmark,
+    allPosts,
+  } = useFetch();
 
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [, setLoading] = useState(true);
-
-  const handleFilterChange = (value: string) => {
-    console.log("Filter changed:", value);
-  };
-
+  const { data, search, reset } = useSearch(
+    "/api/posts?populate=author&filters[title][$containsi]="
+  );
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await api.get(
-          "/api/posts?populate=author"
-        );
+    if (!data?.data) return;
 
-        const formattedPosts: Post[] = res.data.data.map((item: any) => {
-          const attr = item || {};
+    const formatted = data.data.map((item: any) => {
+      const attr = item.attributes ?? item;
+      const author = attr.author?.data?.attributes ?? attr.author ?? null;
 
-          const authorData = attr.author || null; // Changed: author is directly accessible
+      return {
+        id: item.id,
+        title: attr.title,
+        description: attr.description,
+        category: attr.category,
+        tags: attr.tags || [],
+        votes: attr.votes ?? 0,
+        comments: attr.comments ?? 0,
+        views: attr.views ?? 0,
+        seeking: attr.seeking || [],
+        status: attr.statuss,
+        timestamp: new Date(attr.createdAt).toDateString(),
+        voted: false,
+        bookmarked: false,
+        author: {
+          name: author?.name ?? "Anonymous",
+          title: author?.title ?? "",
+          avatar: author?.avatar ?? "?",
+          verified: author?.verified ?? false,
+        },
+      };
+    });
 
-          return {
-            id: item.id,
-            title: attr.title,
-            description: attr.description,
-            category: attr.category,
-            tags: attr.tags || [],
-            votes: attr.votes ?? 0,
-            comments: attr.comments ?? 0,
-            views: attr.views ?? 0,
-            seeking: attr.seeking || [],
-            status: attr.statuss, // Your Strapi field is "statuss" not "status"
-            timestamp: new Date(attr.createdAt).toDateString(),
-            voted: false,
-            bookmarked: false,
+    setPosts(formatted);
+  }, [data, setPosts]);
 
-            author: {
-              name: authorData?.name ?? "Anonymous",
-              title: authorData?.title ?? "",
-              avatar: authorData?.avatar ?? authorData?.name?.charAt(0)?.toUpperCase() ?? "?",
-              verified: authorData?.verified ?? false,
-            },
-          };
-        });
 
-        setPosts(formattedPosts);
-      } catch (error) {
-        console.error("Failed to fetch posts:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPosts();
-  }, []);
-
-  const handleVote = (postId: number) => {
-    setPosts(posts.map(post => {
-      if (post.id == postId) {
-        return {
-          ...post,
-          voted: !post.voted,
-          votes: post.voted ? post.votes - 1 : post.votes + 1
-        };
-      }
-      return post;
-    }));
+  const handleSearch = (value: string) => {
+    if (!value.trim()) {
+      reset();
+      setPosts(allPosts);
+      return; // feed auto-restores from useFetch
+    }
+    search(value);
   };
 
-  const handleBookmark = (postId: number) => {
-    setPosts(posts.map(post => {
-      if (post.id === postId) {
-        return { ...post, bookmarked: !post.bookmarked };
-      }
-      return post;
-    }));
-  };
+  function handleFilterChange(value: string) {
+    console.log("Filter:", value);
+  }
 
   return (
     <>
-       <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50">
-      <style>{`
+      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50">
+        <style>{`
         @keyframes slideUp {
           from {
             opacity: 0;
@@ -182,7 +163,7 @@ export default function FeedMain() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Feed */}
             <div className="lg:col-span-2">
-              <SearchBar onFilterChange={handleFilterChange} />
+              <SearchBar onFilterChange={handleFilterChange} onSearch={handleSearch} />
 
               <div className="animate-slide-up">
                 {posts.map((post, index) => (
