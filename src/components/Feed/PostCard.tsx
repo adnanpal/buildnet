@@ -153,7 +153,7 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
 
           <div className="flex items-center gap-1.5 sm:gap-2">
             <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="sm:text-base font-semibold">{post.views}</span>
+            <span className=" sm:text-base font-semibold">{post.views}</span>
           </div>
         </div>
 

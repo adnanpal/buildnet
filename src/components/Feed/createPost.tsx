@@ -47,10 +47,10 @@ export default function CreatePost() {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const statusOption = [
-    { value: 'seeling-collaborators', label: 'Seeking Collaborators', color: 'bg-green-500' },
-    { value: 'ongoing', label: 'On Going', color: 'bg-blue-500' },
-    { value: 'launched', label: 'Launched', color: 'bg-purple-500' }
-  ];
+  { value: 'seeking-collaborators', label: 'Seeking Collaborators', color: 'bg-green-500' }, // Fixed: 'seeking' not 'seeling'
+  { value: 'in-progress', label: 'In Progress', color: 'bg-blue-500' },
+  { value: 'launched', label: 'Launched', color: 'bg-purple-500' }
+];
 
   const popularTags = [
     'React', 'Node.js', 'Python', 'AI/ML', 'Mobile', 'Web3',
