@@ -2,6 +2,7 @@ import { CheckCircle, MoreHorizontal, Users, ArrowUp, MessageSquare, Eye, Bookma
 type PostStatus = "seeking-collaborators" | "in-progress" | "launched";
 import BuildNetDialog from "../modals/BuildNetDialog";
 import { useState } from "react";
+import api from "../../api/axios";
 
 export interface Post {
   id: number;
@@ -19,6 +20,7 @@ export interface Post {
   bookmarked: boolean;
 
   author: {
+    id: number,
     name: string;
     avatar: string;
     verified: boolean;
@@ -34,12 +36,42 @@ interface PostCardProps {
 
 export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
   const [open, setOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const handleSendRequest = async () => {
-    // axios POST → /api/connection-requests
-    console.log('Send request to user:');
+  console.log("🔍 handleSendRequest called");
+  console.log("📍 selectedUserId:", selectedUserId);
+  console.log("📍 fromUserId:", localStorage.getItem("appUserId"));
+  try {
+    const fromUserId = localStorage.getItem("appUserId");
+
+    if (!fromUserId || !selectedUserId) {
+      alert("Missing user information");
+      return;
+    }
+
+    if (Number(fromUserId) === selectedUserId) {
+      alert("You cannot send request to yourself");
+      return;
+    }
+
+    const res = await api.post("/api/connection-requests", {
+      data: {
+        fromUser: Number(fromUserId),
+        toUser: selectedUserId,
+        connectionStatus: "pending",
+      },
+    });
+
+    console.log("✅ API RESPONSE:", res.data);
+    alert("Connection request sent");
     setOpen(false);
+
+  } catch (err: any) {
+    console.error("❌ API ERROR:", err.response?.data || err);
+    alert("Failed to send request: " + (err.response?.data?.error?.message || err.message));
   }
+};
   const statusConfig = {
     'seeking-collaborators': {
       color: 'bg-gradient-to-r from-green-500 to-emerald-500',
@@ -133,20 +165,19 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
         <div className="flex items-center gap-4 sm:gap-6 text-gray-500">
           <button
             onClick={() => onVote(post.id)}
-            className={`flex items-center gap-2 transition hover:scale-110 ${
-                          post.voted ? 'text-purple-600' : 'hover:text-purple-600'
-                        }
+            className={`flex items-center gap-2 transition hover:scale-110 ${post.voted ? 'text-purple-600' : 'hover:text-purple-600'
+              }
               }`}
           >
-          
+
             <ArrowUp className={`w-5 h-5 sm:w-5 sm:h-5 ${post.voted ? 'fill-current' : ''}`} />
             <span className="font-bold text-sm sm:text-base">{post.votes}</span>
-            
-          </button>      
+
+          </button>
 
           <div className="flex items-center gap-2 sm:gap-2">
-             <div className="p-2 rounded-lg hover:bg-gray-100 transition">
-            <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+            <div className="p-2 rounded-lg hover:bg-gray-100 transition">
+              <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <span className="font-semibold sm:text-base">{post.comments}</span>
           </div>
@@ -162,11 +193,10 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
           <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={() => onBookmark(post.id)}
-              className={`p-2 sm:p-3 rounded-xl transition hover:scale-110 ${
-                          post.bookmarked 
-                            ? 'bg-purple-100 text-purple-600' 
-                            : 'hover:bg-gray-100 text-gray-400'
-                        }`}
+              className={`p-2 sm:p-3 rounded-xl transition hover:scale-110 ${post.bookmarked
+                ? 'bg-purple-100 text-purple-600'
+                : 'hover:bg-gray-100 text-gray-400'
+                }`}
             >
               <Bookmark className={`w-5 h-5 sm:w-5 sm:h-5 ${post.bookmarked ? 'fill-current' : ''}`} />
             </button>
@@ -177,7 +207,10 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
           </div>
 
           <button
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              setOpen(true);
+              setSelectedUserId(post.author.id);
+            }}
             className="px-5 py-2 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold hover:shadow-xl transition hover:scale-105">
             Collaborate
           </button>

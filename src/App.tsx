@@ -11,7 +11,6 @@ import api from "./api/axios";
 function App() {
   const { user, isLoaded } = useUser();
 
-  // 🔁 Sync Clerk user → Strapi app-user
   useEffect(() => {
     if (!isLoaded || !user) return;
 

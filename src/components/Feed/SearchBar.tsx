@@ -5,7 +5,7 @@ interface onFilterChangeProps {
   onFilterChange: (value: string) => void;
   onSearch: (value: string) => void;
 }
-export function SearchBar({onSearch}: onFilterChangeProps) {
+export function SearchBar({onSearch,onFilterChange}: onFilterChangeProps) {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
 
@@ -36,10 +36,10 @@ export function SearchBar({onSearch}: onFilterChangeProps) {
         {/* Filter Tags */}
         {showFilters && (
           <div className="mt-4 flex flex-wrap gap-2 animate-scale-in">
-            {['all', 'seeking', 'in-progress', 'launched'].map(filter => (
+            {['all', 'seeking-collaborators', 'in-progress', 'launched'].map(filter => (
               <button
                 key={filter}
-                onClick={() => setSelectedFilter(filter)}
+                onClick={() => {setSelectedFilter(filter);onFilterChange(filter)}}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition ${selectedFilter === filter
                     ? 'bg-linear-to-r from-purple-600 to-blue-600 text-white shadow-lg'
                     : 'bg-white/50 text-gray-700 hover:bg-white'

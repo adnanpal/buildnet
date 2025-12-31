@@ -14,8 +14,14 @@ export default function useFetch() {
 
         const formattedPosts: Post[] = res.data.data.map((item: any) => {
           const attr = item.attributes ?? item;
-          const authorData =
-            attr.author?.data?.attributes ?? attr.author ?? null;
+         
+          const authorData = attr.author;
+          const authorId = authorData?.id ?? null;
+
+          console.log("🔍 useFetch - Author debug:", {
+            authorData,
+            authorId,
+          });
 
           return {
             id: item.id,
@@ -32,6 +38,7 @@ export default function useFetch() {
             voted: false,
             bookmarked: false,
             author: {
+              id: authorId, // ✅ This should now work
               name: authorData?.name ?? "Anonymous",
               title: authorData?.title ?? "",
               avatar:
@@ -43,6 +50,10 @@ export default function useFetch() {
           };
         });
 
+        console.log("✅ useFetch - Formatted posts with IDs:", 
+          formattedPosts.map(p => ({ postId: p.id, authorId: p.author.id }))
+        );
+        
         setPosts(formattedPosts);
         setAllPosts(formattedPosts);
       } catch (err) {
@@ -78,7 +89,6 @@ export default function useFetch() {
       )
     );
   };
-
 
   return {
     posts,

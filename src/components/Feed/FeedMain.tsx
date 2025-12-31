@@ -17,55 +17,85 @@ export default function FeedMain() {
   } = useFetch();
 
   const { data, search, reset } = useSearch(
-    "/api/posts?populate=author&filters[title][$containsi]="
+    "/api/posts?populate[author][populate]=*&filters[title][$containsi]="
   );
 
-  useEffect(() => {
-    if (!data?.data) return;
+ useEffect(() => {
+  if (!data?.data) return;
 
-    const formatted = data.data.map((item: any) => {
-      const attr = item.attributes ?? item;
-      const author = attr.author?.data?.attributes ?? attr.author ?? null;
+  const formatted = data.data.map((item: any) => {
+    const attr = item.attributes ?? item;
+    
+    
+    const authorData = attr.author?.data ?? attr.author ?? null;
+    const authorAttr = authorData?.attributes ?? authorData ?? null;
+    
+   
+    const authorId = 
+      authorData?.id ?? 
+      attr.author?.data?.id ?? 
+      attr.author?.id ?? 
+      null;
 
-      return {
-        id: item.id,
-        title: attr.title,
-        description: attr.description,
-        category: attr.category,
-        tags: attr.tags || [],
-        votes: attr.votes ?? 0,
-        comments: attr.comments ?? 0,
-        views: attr.views ?? 0,
-        seeking: attr.seeking || [],
-        status: attr.statuss,
-        timestamp: new Date(attr.createdAt).toDateString(),
-        voted: false,
-        bookmarked: false,
-        author: {
-          name: author?.name ?? "Anonymous",
-          title: author?.title ?? "",
-          avatar: author?.avatar ?? "?",
-          verified: author?.verified ?? false,
-        },
-      };
+    console.log("🔍 Debugging author:", {
+      authorData,
+      authorId,
+      fullAuthorObject: attr.author
     });
 
-    setPosts(formatted);
-  }, [data, setPosts]);
+    return {
+      id: item.id,
+      title: attr.title,
+      description: attr.description,
+      category: attr.category,
+      tags: attr.tags || [],
+      votes: attr.votes ?? 0,
+      comments: attr.comments ?? 0,
+      views: attr.views ?? 0,
+      seeking: attr.seeking || [],
+      status: attr.statuss,
+      timestamp: new Date(attr.createdAt).toDateString(),
+      voted: false,
+      bookmarked: false,
+      author: {
+        id: authorId, 
+        name: authorAttr?.name ?? "Anonymous",
+        title: authorAttr?.title ?? "",
+        avatar: authorAttr?.avatar ?? "?",
+        verified: authorAttr?.verified ?? false,
+      },
+    };
+  });
 
+  console.log("✅ Final formatted posts:", formatted);
+  setPosts(formatted);
+}, [data, setPosts]);
+
+function handleFilterChange(value:string){
+
+  if(value==="all"){
+    setPosts(allPosts);
+    return;
+  }
+  if(value==="seeking"){
+    setPosts(allPosts.filter(post=>post.status==="seeking-collaborators"||post.seeking.length>0));
+    return;
+  }
+
+  setPosts(
+    allPosts.filter(post => post.status === value)
+  );
+}
 
   const handleSearch = (value: string) => {
     if (!value.trim()) {
       reset();
       setPosts(allPosts);
-      return; // feed auto-restores from useFetch
+      return; 
     }
     search(value);
   };
 
-  function handleFilterChange(value: string) {
-    console.log("Filter:", value);
-  }
 
   return (
     <>

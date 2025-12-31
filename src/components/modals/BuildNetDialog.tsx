@@ -15,9 +15,10 @@ export default function BuildNetDialog({
 }: BuildNetDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
+     
       <DialogBackdrop
         transition
-        className="fixed inset-0 backdrop-blur-sm transition-opacity"
+         className="fixed inset-0 backdrop-blur-sm transition-opacity pointer-events-none"
       />
 
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -27,10 +28,7 @@ export default function BuildNetDialog({
             className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl transition-all"
           >
             {/* Close */}
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100"
-            >
+            <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100">
               <X className="w-5 h-5 text-gray-400" />
             </button>
 
@@ -61,7 +59,7 @@ export default function BuildNetDialog({
                 Cancel
               </button>
               <button
-                onClick={onConfirm}
+               onClick={onConfirm}
                 className="rounded-lg bg-linear-to-r from-purple-600 to-blue-600 px-4 py-2 text-white"
               >
                 Send Request
