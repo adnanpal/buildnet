@@ -52,6 +52,12 @@ function App() {
 
         localStorage.setItem("appUserId", createRes.data.data.id);
         console.log("✅ app-user created:", createRes.data);
+
+        // 3️⃣ NEW: If user doesn't have profileCompleted metadata, redirect to profile
+        if (!user.unsafeMetadata?.profileCompleted) {
+          console.log("⏳ New user detected, redirecting to profile completion...");
+          // Don't navigate here, let the routing logic handle it
+        }
       } catch (err) {
         console.error("❌ Error syncing app-user:", err);
       }

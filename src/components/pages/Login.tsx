@@ -17,18 +17,20 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
   const { signIn, setActive, isLoaded } = useSignIn();
   const navigate = useNavigate();
 
-  // Fixed OAuth Login Handler
+  // OAuth Login Handler - Works in both dev and production
   const handleOAuthLogin = async (provider: "oauth_google" | "oauth_github") => {
     if (!isLoaded) return;
 
     try {
+      // For OAuth, we use authenticateWithRedirect which handles both login AND signup
       await signIn.authenticateWithRedirect({
         strategy: provider,
-        redirectUrl: "/sso-callback", // Temporary callback route
-        redirectUrlComplete: "/", // This will be handled by App.tsx routing logic
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: "/", // Always go to root, App.tsx handles routing
       });
     } catch (err: any) {
-      console.error("OAuth Login Failed:", err);
+      console.error("OAuth Failed:", err);
+      alert("Failed to authenticate. Please try again.");
     }
   };
 
