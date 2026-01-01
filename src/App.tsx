@@ -6,7 +6,11 @@ import AuthPages from "./components/pages/AuthPages";
 import FeedMain from "./components/Feed/FeedMain";
 import CreatePost from "./components/Feed/createPost";
 import { useEffect } from "react";
+import MyProjects from "./components/Feed/MyProjects";
 import api from "./api/axios";
+import Layout from "./components/pages/Layout";
+import Trending from "./components/Feed/Trending";
+import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 
 function App() {
   const { user, isLoaded } = useUser();
@@ -122,6 +126,14 @@ function App() {
 
       <Routes>
         {/* =====================================================
+            SSO CALLBACK ROUTE (Always available)
+        ===================================================== */}
+        <Route 
+          path="/sso-callback" 
+          element={<AuthenticateWithRedirectCallback />} 
+        />
+
+        {/* =====================================================
             CASE 1: USER NOT LOGGED IN → PUBLIC ROUTES
         ===================================================== */}
         {!user && (
@@ -138,7 +150,6 @@ function App() {
         {user && !isProfileComplete && (
           <>
             <Route path="/profile" element={<Main />} />
-            <Route path="/create" element={<CreatePost />} /> {/* ✅ allow */}
             <Route path="*" element={<Navigate to="/profile" replace />} />
           </>
         )}
@@ -148,9 +159,18 @@ function App() {
         ===================================================== */}
         {user && isProfileComplete && (
           <>
-            <Route path="/" element={<FeedMain />} />
+            {/* Routes WITH Layout (Navbar) */}
+            <Route element={<Layout />}>
+              <Route path="/" element={<FeedMain />} />
+              <Route path="/trending" element={<Trending />} />
+              <Route path="/my-projects" element={<MyProjects />} />
+            </Route>
+
+            {/* Routes WITHOUT Layout (Navbar) */}
             <Route path="/profile" element={<Main />} />
             <Route path="/create" element={<CreatePost />} />
+
+            {/* Catch all - redirect to feed */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
         )}

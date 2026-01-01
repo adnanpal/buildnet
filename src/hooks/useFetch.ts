@@ -2,15 +2,21 @@ import { useEffect, useState } from "react";
 import type { Post } from "../components/Feed/PostCard";
 import api from "../api/axios";
 
-export default function useFetch() {
+export default function useFetch(url:string|null) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
 
+
+
   useEffect(() => {
+    if (!url) {
+      setLoading(false);
+      return;
+    }
     const fetchPosts = async () => {
       try {
-        const res = await api.get("/api/posts?populate=author");
+        const res = await api.get(url);
 
         const formattedPosts: Post[] = res.data.data.map((item: any) => {
           const attr = item.attributes ?? item;
@@ -64,7 +70,7 @@ export default function useFetch() {
     };
 
     fetchPosts();
-  }, []);
+  }, [url]);
 
   const handleVote = (postId: number) => {
     setPosts((prev) =>

@@ -14,7 +14,7 @@ export default function FeedMain() {
     setPosts,
     handleBookmark,
     allPosts,
-  } = useFetch();
+  } = useFetch("/api/posts?populate=author");
 
   const { data, search, reset } = useSearch(
     "/api/posts?populate[author][populate]=*&filters[title][$containsi]="
@@ -189,7 +189,7 @@ function handleFilterChange(value:string){
         }
       `}</style>
         <FeedNavbar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Feed */}
             <div className="lg:col-span-2">

@@ -10,11 +10,19 @@ export default function FeedNavbar() {
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('feed');
     const desktopDropdownRef = useRef<HTMLDivElement>(null);
     const mobileDropdownRef = useRef<HTMLDivElement>(null);
+    const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+    const [, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
     const { signOut } = useClerk();
+
+    const activeTab =
+        location.pathname === "/" ? "feed" :
+            location.pathname === "/trending" ? "trending" :
+                location.pathname.startsWith("/my-project") ? "projects" :
+                    "";
+
 
     const [formData] = useState({
         username: user?.username
@@ -53,12 +61,17 @@ export default function FeedNavbar() {
         }
     };
 
-    const handleNavigation = (path: string) => {
-        console.log('Navigating to:', path);
-        setMobileMenuOpen(false);
-        setProfileDropdownOpen(false);
-        navigate(path);
-    };
+    useEffect(() => {
+        const activeTabElement = tabRefs.current[activeTab];
+        if (activeTabElement) {
+            const { offsetLeft, offsetWidth } = activeTabElement;
+            setIndicatorStyle({
+                left: offsetLeft,
+                width: offsetWidth
+            });
+        }
+    }, [activeTab]);
+
 
     return (
         <>
@@ -123,7 +136,7 @@ export default function FeedNavbar() {
                 .shimmer-button {
                     background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%);
                     background-size: 200% auto;
-                    transition: all 0.3s ease;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 }
 
                 .shimmer-button:hover {
@@ -140,6 +153,9 @@ export default function FeedNavbar() {
                     position: relative;
                     transition: all 0.3s ease;
                 }
+                .nav-tab:not(.active):hover {
+                     transform: translateY(-1px);
+                }
 
                 .nav-tab::after {
                     content: '';
@@ -151,11 +167,20 @@ export default function FeedNavbar() {
                     height: 3px;
                     background: linear-gradient(90deg, #9333ea, #3b82f6);
                     border-radius: 2px;
-                    transition: transform 0.3s ease;
+                    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 }
 
                 .nav-tab.active::after {
                     transform: translateX(-50%) scaleX(1);
+                }
+                .nav-indicator {
+                    position: absolute;
+                    bottom: -2px;
+                    height: 3px;
+                    background: linear-gradient(90deg, #9333ea, #3b82f6);
+                    border-radius: 2px;
+                    transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
                 }
 
                 .glassmorphism {
@@ -172,7 +197,7 @@ export default function FeedNavbar() {
 
                 .profile-avatar {
                     background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%);
-                    transition: all 0.3s ease;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 }
 
                 .profile-avatar:hover {
@@ -181,11 +206,18 @@ export default function FeedNavbar() {
                 }
 
                 .menu-item {
-                    transition: all 0.2s ease;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                 }
+                
 
                 .menu-item:active {
                     transform: scale(0.98);
+                }
+                .mobile-nav-item {
+                     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                .mobile-nav-item.active {
+                     transform: translateX(4px);
                 }
             `}</style>
 
@@ -205,10 +237,11 @@ export default function FeedNavbar() {
                                 </div>
 
                                 {/* Desktop Navigation */}
+
                                 <div className="hidden lg:flex items-center space-x-1">
                                     <button
-                                        onClick={() => setActiveTab('feed')}
-                                        className={`nav-tab px-5 py-2 rounded-xl font-semibold transition-all ${activeTab === 'feed'
+                                        onClick={() => navigate("/")}
+                                        className={`nav-tab px-5 py-2 rounded-xl font-semibold transition-all duration-200 ${activeTab === 'feed'
                                             ? 'active text-purple-600'
                                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                             }`}
@@ -216,7 +249,7 @@ export default function FeedNavbar() {
                                         Feed
                                     </button>
                                     <button
-                                        onClick={() => setActiveTab('trending')}
+                                        onClick={() => navigate("/trending")}
                                         className={`nav-tab px-5 py-2 rounded-xl font-semibold transition-all ${activeTab === 'trending'
                                             ? 'active text-purple-600'
                                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -225,8 +258,9 @@ export default function FeedNavbar() {
                                         Trending
                                     </button>
                                     <button
-                                        onClick={() => setActiveTab('projects')}
-                                        className={`nav-tab px-5 py-2 rounded-xl font-semibold transition-all ${activeTab === 'projects'
+                                        onClick={() => navigate("/my-projects")}
+
+                                        className={`nav-tab px-5 py-2 rounded-xl font-semibold transition-all duration-200 ${activeTab === 'projects'
                                             ? 'active text-purple-600'
                                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                             }`}
@@ -234,6 +268,7 @@ export default function FeedNavbar() {
                                         My Projects
                                     </button>
                                 </div>
+
 
                                 {/* Desktop Right Section */}
                                 <div className="hidden lg:flex items-center space-x-3">
@@ -244,7 +279,7 @@ export default function FeedNavbar() {
 
                                     <button
                                         onMouseDown={(e) => e.stopPropagation()}
-                                        onClick={() => handleNavigation('/create')}
+                                        onClick={() => navigate("/create")}
                                         className="shimmer-button text-white px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 shadow-lg"
                                     >
                                         <Plus className="w-5 h-5" />
@@ -441,7 +476,7 @@ export default function FeedNavbar() {
                                     {/* Navigation Links */}
                                     <button
                                         onClick={() => {
-                                            setActiveTab('feed');
+                                            navigate("/")
                                             setMobileMenuOpen(false);
                                         }}
                                         className={`menu-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition ${activeTab === 'feed'
@@ -455,7 +490,7 @@ export default function FeedNavbar() {
 
                                     <button
                                         onClick={() => {
-                                            setActiveTab('trending');
+                                            navigate("/trending");
                                             setMobileMenuOpen(false);
                                         }}
                                         className={`menu-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition ${activeTab === 'trending'
@@ -469,7 +504,8 @@ export default function FeedNavbar() {
 
                                     <button
                                         onClick={() => {
-                                            setActiveTab('projects');
+                                            navigate("/my-projects");
+
                                             setMobileMenuOpen(false);
                                         }}
                                         className={`menu-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition ${activeTab === 'projects'
