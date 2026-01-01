@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Lightbulb, Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-react';
-import { useSignIn } from '@clerk/clerk-react';
+import {  useSignIn } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
+
 
 interface LoginPageProps {
   onSwitchToSignup: () => void;
 }
-
+// Login Page Component
 function LoginPage({ onSwitchToSignup }: LoginPageProps) {
   const [formData, setFormData] = useState({
     email: '',
@@ -17,47 +18,45 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
   const { signIn, setActive, isLoaded } = useSignIn();
   const navigate = useNavigate();
 
-  // OAuth Login Handler - Works in both dev and production
   const handleOAuthLogin = async (provider: "oauth_google" | "oauth_github") => {
     if (!isLoaded) return;
 
-    try {
-      // For OAuth, we use authenticateWithRedirect which handles both login AND signup
-      await signIn.authenticateWithRedirect({
-        strategy: provider,
-        redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/", // Always go to root, App.tsx handles routing
-      });
-    } catch (err: any) {
-      console.error("OAuth Failed:", err);
-      alert("Failed to authenticate. Please try again.");
-    }
+    await signIn.authenticateWithRedirect({
+      strategy: provider,
+      redirectUrl: "/sso-callback",
+      redirectUrlComplete: "/complete-profile",
+    });
   };
 
-  // Email/Password Login Handler
-  const handleLogin = async (email: string, password: string) => {
-    if (!isLoaded) return;
 
-    try {
-      const signInAttempt = await signIn.create({
-        identifier: email,
-      });
+ const handleLogin = async (email: string, password: string) => {
+  if (!isLoaded) return;
 
-      const result = await signInAttempt.attemptFirstFactor({
-        strategy: "password",
-        password,
-      });
+  try {
+   
+    const signInAttempt = await signIn.create({
+      identifier: email,
+    });
 
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        
-        // Navigate to root - App.tsx will handle routing based on profile completion
-        navigate("/");
-      }
-    } catch (err: any) {
-      console.error("Login Failed:", err.errors?.[0]?.message);
-      alert(err.errors?.[0]?.message || "Login failed. Please try again.");
+    const result = await signInAttempt.attemptFirstFactor({
+      strategy: "password",
+      password,
+    });
+
+    if (result.status === "complete") {
+      await setActive({ session: result.createdSessionId });
+      navigate("/");
     }
+
+  } catch (err: any) {
+    console.error("Login Failed:", err.errors?.[0]?.message);
+  }
+};
+
+
+  const handleSocialLogin = (provider: string) => {
+    console.log(`Login with ${provider}`);
+    alert(`Logging in with ${provider}...`);
   };
 
   return (
@@ -115,16 +114,17 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
         <div className="bg-white rounded-2xl shadow-2xl p-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
           {/* Social Login Buttons */}
           <div className="space-y-3 mb-6">
-            <button
-              onClick={() => handleOAuthLogin("oauth_google")}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
-            >
-              <Chrome className="w-5 h-5" />
-              Continue with Google
-            </button>
+           
+              <button
+                onClick={() => handleOAuthLogin("oauth_google")}
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
+              >
+                <Chrome className="w-5 h-5" />
+                Continue with Google
+              </button>
 
             <button
-              onClick={() => handleOAuthLogin("oauth_github")}
+              onClick={() => handleSocialLogin('GitHub')}
               className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
             >
               <Github className="w-5 h-5" />
@@ -141,7 +141,6 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
               <span className="px-4 bg-white text-gray-500 font-medium">Or continue with email</span>
             </div>
           </div>
-
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -149,6 +148,7 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
             }}
             className="space-y-5"
           >
+          <div className="space-y-5">
             {/* Email Input */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
@@ -160,7 +160,6 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="you@example.com"
                   className="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-purple-600 focus:outline-none transition"
-                  required
                 />
               </div>
             </div>
@@ -176,7 +175,6 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="Enter your password"
                   className="w-full pl-12 pr-12 py-3 rounded-lg border-2 border-gray-200 focus:border-purple-600 focus:outline-none transition"
-                  required
                 />
                 <button
                   type="button"
@@ -212,6 +210,7 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
               Sign In
               <ArrowRight className="w-5 h-5" />
             </button>
+          </div>
           </form>
 
           {/* Sign Up Link */}
@@ -229,5 +228,4 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
     </div>
   );
 }
-
 export default LoginPage;
