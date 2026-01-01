@@ -145,7 +145,7 @@ function App() {
         ===================================================== */}
         <Route
           path="/sso-callback"
-          element={<AuthenticateWithRedirectCallback />}
+          element={<AuthenticateWithRedirectCallback/>}
         />
 
         {/* =====================================================
