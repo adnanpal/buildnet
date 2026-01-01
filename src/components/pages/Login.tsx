@@ -24,7 +24,7 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
     await signIn.authenticateWithRedirect({
       strategy: provider,
       redirectUrl: "/sso-callback",
-      redirectUrlComplete: "/profile",
+      redirectUrlComplete: "https://buildnet-two.vercel.app/",
     });
   };
 

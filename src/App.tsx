@@ -53,11 +53,20 @@ function App() {
         localStorage.setItem("appUserId", createRes.data.data.id);
         console.log("✅ app-user created:", createRes.data);
 
+        if (!user.unsafeMetadata?.profileCompleted) {
+          await user.update({
+            unsafeMetadata: {
+              profileCompleted: false,
+            },
+          });
+        }
+
         // 3️⃣ NEW: If user doesn't have profileCompleted metadata, redirect to profile
         if (!user.unsafeMetadata?.profileCompleted) {
           console.log("⏳ New user detected, redirecting to profile completion...");
           // Don't navigate here, let the routing logic handle it
         }
+
       } catch (err) {
         console.error("❌ Error syncing app-user:", err);
       }
@@ -134,9 +143,9 @@ function App() {
         {/* =====================================================
             SSO CALLBACK ROUTE (Always available)
         ===================================================== */}
-        <Route 
-          path="/sso-callback" 
-          element={<AuthenticateWithRedirectCallback />} 
+        <Route
+          path="/sso-callback"
+          element={<AuthenticateWithRedirectCallback />}
         />
 
         {/* =====================================================
@@ -155,6 +164,7 @@ function App() {
         ===================================================== */}
         {user && !isProfileComplete && (
           <>
+            <Route path="/" element={<Navigate to="/profile" replace />} />
             <Route path="/profile" element={<Main />} />
             <Route path="*" element={<Navigate to="/profile" replace />} />
           </>
