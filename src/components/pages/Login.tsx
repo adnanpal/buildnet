@@ -24,7 +24,7 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
     await signIn.authenticateWithRedirect({
       strategy: provider,
       redirectUrl: "/sso-callback",
-      redirectUrlComplete: "/complete-profile",
+      redirectUrlComplete: "/profile",
     });
   };
 
