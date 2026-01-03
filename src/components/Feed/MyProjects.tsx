@@ -13,7 +13,7 @@ export default function MyProjects() {
     handleBookmark,
   } = useFetch(
     isLoaded && appUserId
-      ? `/api/posts?filters[app_user][id][$eq]=${appUserId}&populate=app_user`
+      ? `/api/posts?filters[app_user][id][$eq]=${appUserId}&populate[author]=*&populate[app_user]=*`
       : null
   );
 
