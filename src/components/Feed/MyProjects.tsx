@@ -119,7 +119,8 @@ export default function MyProjects() {
           background-clip: text;
         }
       `}</style>
-
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-12">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6"></div>
       <div className="animate-slide-up">
         {posts.map((post, index) => (
           <div key={post.id} style={{ animationDelay: `${index * 0.1}s` }}>
@@ -132,5 +133,6 @@ export default function MyProjects() {
         ))}
       </div>
     </div>
+  </div>
   );
 }
