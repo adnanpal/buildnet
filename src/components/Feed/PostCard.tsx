@@ -39,39 +39,40 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const handleSendRequest = async () => {
-  console.log("🔍 handleSendRequest called");
-  console.log("📍 selectedUserId:", selectedUserId);
-  console.log("📍 fromUserId:", localStorage.getItem("appUserId"));
-  try {
-    const fromUserId = localStorage.getItem("appUserId");
+    console.log("🔍 handleSendRequest called");
+    console.log("📍 selectedUserId:", selectedUserId);
+    console.log("📍 fromUserId:", localStorage.getItem("appUserId"));
+    try {
+      const fromUserId = localStorage.getItem("appUserId");
 
-    if (!fromUserId || !selectedUserId) {
-      alert("Missing user information");
-      return;
+      if (!fromUserId || !selectedUserId) {
+        alert("Missing user information");
+        return;
+      }
+
+      if (Number(fromUserId) === selectedUserId) {
+        alert("You cannot send request to yourself");
+        return;
+      }
+
+      const res = await api.post("/api/connection-requests", {
+        data: {
+          fromUser: Number(fromUserId),
+          toUser: selectedUserId,
+          connectionStatus: "pending",
+        },
+      });
+
+      console.log("✅ API RESPONSE:", res.data);
+      alert("Connection request sent");
+      setOpen(false);
+
+    } catch (err: any) {
+      console.error("❌ API ERROR:", err.response?.data || err);
+      alert("Failed to send request: " + (err.response?.data?.error?.message || err.message));
     }
+  };
 
-    if (Number(fromUserId) === selectedUserId) {
-      alert("You cannot send request to yourself");
-      return;
-    }
-
-    const res = await api.post("/api/connection-requests", {
-      data: {
-        fromUser: Number(fromUserId),
-        toUser: selectedUserId,
-        connectionStatus: "pending",
-      },
-    });
-
-    console.log("✅ API RESPONSE:", res.data);
-    alert("Connection request sent");
-    setOpen(false);
-
-  } catch (err: any) {
-    console.error("❌ API ERROR:", err.response?.data || err);
-    alert("Failed to send request: " + (err.response?.data?.error?.message || err.message));
-  }
-};
   const statusConfig = {
     'seeking-collaborators': {
       color: 'bg-gradient-to-r from-green-500 to-emerald-500',
@@ -93,14 +94,14 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-4 sm:p-6 mb-4 border border-gray-100">
       {/* Author Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white font-bold shadow-lg">
+      <div className="flex items-start justify-between mb-4 gap-2">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white font-bold shadow-lg shrink-0">
             {post.author?.avatar ?? "?"}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-gray-900">{post.author?.name ?? "Anonymous"}</h3>
+              <h3 className="font-bold text-gray-900 truncate">{post.author?.name ?? "Anonymous"}</h3>
               {post.author?.verified && (
                 <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500 shrink-0" />
               )}
@@ -109,13 +110,13 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-2">
-          <div className={`${statusConfig[post.status]?.color} text-white px-3 py-1 rounded-full flex items-center gap-1.5 text-xs font-bold shadow-lg`}>
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className={`${statusConfig[post.status]?.color} text-white px-2 sm:px-3 py-1 rounded-full flex items-center gap-1 sm:gap-1.5 text-xs font-bold shadow-lg whitespace-nowrap`}>
             {statusConfig[post.status]?.icon}
-            {statusConfig[post.status]?.text}
+            <span>{statusConfig[post.status]?.text}</span>
           </div>
-          <button className="p-2 sm:p-2 hover:bg-gray-100 rounded-lg transition">
-            <MoreHorizontal className="w-5 h-5 sm:w-5 sm:h-5 text-gray-400" />
+          <button className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition shrink-0">
+            <MoreHorizontal className="w-5 h-5 text-gray-400" />
           </button>
         </div>
       </div>
@@ -144,10 +145,8 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
         {/* Seeking Collaborators */}
         {post.seeking.length > 0 && (
           <div className="flex items-center gap-2 p-3 bg-linear-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200">
-            <Users className="w-5 h-5 text-purple-600" />
-            <span className="text-sm font-bold text-purple-900">Seeking:</span>
-            <div className="flex flex-wrap gap-2">
-            </div>
+            <Users className="w-5 h-5 text-purple-600 shrink-0" />
+            <span className="text-sm font-bold text-purple-900 shrink-0">Seeking:</span>
             <div className="flex flex-wrap gap-2 sm:gap-2">
               {post.seeking.map((role, index) => (
                 <span key={index} className="text-xs sm:text-sm text-purple-700 font-semibold">
@@ -160,19 +159,15 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
       </div>
 
       {/* Post Stats and Actions */}
-      <div className="flex items-center justify-between  border-t border-gray-200 sm:flex-row sm:items-center sm:justify-between  sm:gap-0 pt-3 sm:pt-4">
+      <div className="flex items-center justify-between border-t border-gray-200 sm:flex-row sm:items-center sm:justify-between sm:gap-0 pt-3 sm:pt-4">
         {/* Stats */}
         <div className="flex items-center gap-4 sm:gap-6 text-gray-500">
           <button
             onClick={() => onVote(post.id)}
-            className={`flex items-center gap-2 transition hover:scale-110 ${post.voted ? 'text-purple-600' : 'hover:text-purple-600'
-              }
-              }`}
+            className={`flex items-center gap-2 transition hover:scale-110 ${post.voted ? 'text-purple-600' : 'hover:text-purple-600'}`}
           >
-
             <ArrowUp className={`w-5 h-5 sm:w-5 sm:h-5 ${post.voted ? 'fill-current' : ''}`} />
             <span className="font-bold text-sm sm:text-base">{post.votes}</span>
-
           </button>
 
           <div className="flex items-center gap-2 sm:gap-2">
@@ -184,7 +179,7 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
 
           <div className="flex items-center gap-1.5 sm:gap-2">
             <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className=" sm:text-base font-semibold">{post.views}</span>
+            <span className="sm:text-base font-semibold">{post.views}</span>
           </div>
         </div>
 
