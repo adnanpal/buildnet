@@ -1,10 +1,10 @@
+import useAppUser from "../../hooks/useAppUser";
 import useFetch from "../../hooks/useFetch";
 import { PostCard } from "./PostCard";
-import { useUser } from "@clerk/clerk-react";
 
 export default function MyProjects() {
-  const { user, isLoaded } = useUser();
-  const appUserId = localStorage.getItem("appUserId");
+  
+  const { appUserId, isLoaded } = useAppUser();
 
   const {
     posts,
@@ -13,7 +13,7 @@ export default function MyProjects() {
     handleBookmark,
   } = useFetch(
     isLoaded && appUserId
-      ? `/api/posts?filters[author][id][$eq]=${appUserId}&populate=author`
+      ? `/api/posts?filters[app_user][id][$eq]=${appUserId}&populate=app_user`
       : null
   );
 

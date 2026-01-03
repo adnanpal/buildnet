@@ -1,79 +1,18 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./components/Homepage";
-import { useUser } from "@clerk/clerk-react";
 import Main from "./components/profilesection/Main";
 import AuthPages from "./components/pages/AuthPages";
 import FeedMain from "./components/Feed/FeedMain";
 import CreatePost from "./components/Feed/createPost";
-import { useEffect } from "react";
 import MyProjects from "./components/Feed/MyProjects";
-import api from "./api/axios";
 import Layout from "./components/pages/Layout";
 import Trending from "./components/Feed/Trending";
 import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
+import useAppUser from "./hooks/useAppUser";
 
 function App() {
-  const { user, isLoaded } = useUser();
-
-  useEffect(() => {
-    if (!isLoaded || !user) return;
-
-    const syncUserToStrapi = async () => {
-      try {
-        // 1️⃣ Check if app-user already exists
-        const findRes = await api.get(
-          `/api/app-users?filters[clerkUserId][$eq]=${user.id}`
-        );
-
-        if (findRes.data.data.length > 0) {
-          const existingUser = findRes.data.data[0];
-          localStorage.setItem("appUserId", existingUser.id);
-          console.log("✅ app-user already exists");
-          return;
-        }
-
-        // 2️⃣ Create app-user if not found
-        console.log("⏳ Creating app-user in Strapi...", {
-          clerkUserId: user.id,
-          email: user.emailAddresses[0].emailAddress,
-          name: user.fullName,
-        });
-
-        const createRes = await api.post(
-          "/api/app-users",
-          {
-            data: {
-              clerkUserId: user.id,
-              email: user.emailAddresses[0].emailAddress,
-              name: user.fullName,
-            },
-          }
-        );
-
-        localStorage.setItem("appUserId", createRes.data.data.id);
-        console.log("✅ app-user created:", createRes.data);
-
-        if (!user.unsafeMetadata?.profileCompleted) {
-          await user.update({
-            unsafeMetadata: {
-              profileCompleted: false,
-            },
-          });
-        }
-
-        // 3️⃣ NEW: If user doesn't have profileCompleted metadata, redirect to profile
-        if (!user.unsafeMetadata?.profileCompleted) {
-          console.log("⏳ New user detected, redirecting to profile completion...");
-          // Don't navigate here, let the routing logic handle it
-        }
-
-      } catch (err) {
-        console.error("❌ Error syncing app-user:", err);
-      }
-    };
-
-    syncUserToStrapi();
-  }, [user, isLoaded]);
+   
+   const { isLoaded,user } = useAppUser();
 
   // ⏳ Show loading state while Clerk is initializing
   if (!isLoaded) {

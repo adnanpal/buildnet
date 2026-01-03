@@ -7,7 +7,7 @@ import api from "../../api/axios";
 export default function CreatePost() {
   const { createPost } = usePost();
   const [authorId, setAuthorId] = useState<number | null>(null);
-
+  const appUserId = localStorage.getItem("appUserId");
   const { user } = useUser();
 
   useEffect(() => {
@@ -105,7 +105,8 @@ export default function CreatePost() {
       statuss: formData.statuss,
       author: authorId,        // ✅ relation
       tags: formData.tags,     // ✅ already array
-      seeking: formData.seekingRoles
+      seeking: formData.seekingRoles,
+      app_user:appUserId
     };
 
     const success = await createPost(payload);
