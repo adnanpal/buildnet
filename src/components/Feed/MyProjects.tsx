@@ -4,7 +4,7 @@ import { useUser } from "@clerk/clerk-react";
 
 export default function MyProjects() {
   const { user, isLoaded } = useUser();
-  const appUserId = user?.unsafeMetadata?.appUserId;
+  const appUserId = localStorage.getItem("appUserId");
 
   const {
     posts,
