@@ -9,6 +9,7 @@ import Layout from "./components/pages/Layout";
 import Trending from "./components/Feed/Trending";
 import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 import useAppUser from "./hooks/useAppUser";
+import "./styles/app.css";
 
 function App() {
    
@@ -31,53 +32,6 @@ function App() {
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-blue-50">
       {/* 🎨 Global Styles */}
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-        }
-        
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-on-scroll {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        
-        .animate-on-scroll.visible {
-          animation: slide-up 0.6s ease-out forwards;
-        }
-        
-        .floating {
-          animation: float 6s ease-in-out infinite;
-        }
-        
-        .text-rotate-enter {
-          animation: slide-up 0.5s ease-out;
-        }
-        
-        .hero-bg-circle {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(80px);
-          animation: pulse-slow 8s ease-in-out infinite;
-        }
-      `}</style>
-
       <Routes>
         {/* =====================================================
             SSO CALLBACK ROUTE (Always available)

@@ -2,7 +2,7 @@ import { Lightbulb, Bell, Plus, Menu, X, Home, TrendingUp, FolderKanban, User, L
 import { useState, useRef, useEffect } from 'react';
 import { useUser, useClerk } from "@clerk/clerk-react";
 import { useNavigate } from 'react-router-dom';
-
+import "../../styles/animation.css";
 
 export default function FeedNavbar() {
 
@@ -75,152 +75,6 @@ export default function FeedNavbar() {
 
     return (
         <>
-            <style>{`
-                @keyframes slideDown {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-12px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                
-                @keyframes slideInMobile {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-
-                @keyframes shimmer {
-                    0% { background-position: -200% center; }
-                    100% { background-position: 200% center; }
-                }
-                
-                .dropdown-menu {
-                    animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-                }
-
-                .mobile-menu {
-                    animation: slideInMobile 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-                }
-
-                .gradient-border {
-                    
-                    position: relative;
-                    background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
-                    backdrop-filter: blur(20px);
-                    -webkit-backdrop-filter: blur(20px);
-                }
-
-                .gradient-border::before {
-                   
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    border-radius: inherit;
-                    padding: 1px;
-                    background: linear-gradient(135deg, rgba(147, 51, 234, 0.3), rgba(59, 130, 246, 0.3));
-                    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-                    -webkit-mask-composite: xor;
-                    mask-composite: exclude;
-                    pointer-events: none;
-                }
-
-                .shimmer-button {
-                    background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%);
-                    background-size: 200% auto;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-
-                .shimmer-button:hover {
-                    background-position: right center;
-                    transform: translateY(-2px);
-                    box-shadow: 0 10px 25px -5px rgba(147, 51, 234, 0.4), 0 8px 10px -6px rgba(59, 130, 246, 0.3);
-                }
-
-                .shimmer-button:active {
-                    transform: translateY(0px);
-                }
-
-                .nav-tab {
-                    position: relative;
-                    transition: all 0.3s ease;
-                }
-                .nav-tab:not(.active):hover {
-                     transform: translateY(-1px);
-                }
-
-                .nav-tab::after {
-                    content: '';
-                    position: absolute;
-                    bottom: -2px;
-                    left: 50%;
-                    transform: translateX(-50%) scaleX(0);
-                    width: 100%;
-                    height: 3px;
-                    background: linear-gradient(90deg, #9333ea, #3b82f6);
-                    border-radius: 2px;
-                    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-
-                .nav-tab.active::after {
-                    transform: translateX(-50%) scaleX(1);
-                }
-                .nav-indicator {
-                    position: absolute;
-                    bottom: -2px;
-                    height: 3px;
-                    background: linear-gradient(90deg, #9333ea, #3b82f6);
-                    border-radius: 2px;
-                    transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-                    width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-                }
-
-                .glassmorphism {
-                    background: rgba(255, 255, 255, 0.85);
-                    backdrop-filter: blur(12px) saturate(180%);
-                    -webkit-backdrop-filter: blur(12px) saturate(180%);
-                }
-
-                @media (max-width: 768px) {
-                    .glassmorphism {
-                        background: rgba(255, 255, 255, 0.95);
-                    }
-                }
-
-                .profile-avatar {
-                    background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%);
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-
-                .profile-avatar:hover {
-                    transform: scale(1.05);
-                    box-shadow: 0 8px 16px -4px rgba(147, 51, 234, 0.4);
-                }
-
-                .menu-item {
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-                
-
-                .menu-item:active {
-                    transform: scale(0.98);
-                }
-                .mobile-nav-item {
-                     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-                .mobile-nav-item.active {
-                     transform: translateX(4px);
-                }
-            `}</style>
-
             <nav className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-4 lg:px-6 pt-3 sm:pt-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="gradient-border glassmorphism rounded-2xl shadow-xl shadow-purple-500/10">
@@ -273,8 +127,10 @@ export default function FeedNavbar() {
                                 {/* Desktop Right Section */}
                                 <div className="hidden lg:flex items-center space-x-3">
                                     <button className="p-2.5 hover:bg-linear-to-br hover:from-gray-50 hover:to-gray-100 rounded-xl transition-all group relative">
-                                        <Bell className="w-5 h-5 text-gray-600 group-hover:text-purple-600 transition-colors" />
-                                        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                                        <Bell className="w-6 h-6 text-gray-600 group-hover:text-purple-600 transition-colors" />
+                                        <span className="absolute top-1 right-1 min-w-3 h-3 px-1 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">
+                                            3
+                                        </span>
                                     </button>
 
                                     <button

@@ -3,6 +3,7 @@ import { usePost } from "../../hooks/usePost";
 import { Lightbulb, X, Plus, Sparkles, Users, FileText, Tag, Layers, CheckCircle } from 'lucide-react';
 import { useUser } from "@clerk/clerk-react";
 import api from "../../api/axios";
+import "../../styles/post.css";
 
 export default function CreatePost() {
   const { createPost } = usePost();
@@ -131,49 +132,6 @@ export default function CreatePost() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-blue-50 py-6 sm:py-12 px-3 sm:px-4 lg:px-8">
-      <style>{`
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-
-        @keyframes successPulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-        }
-
-        .animate-slide-up {
-          animation: slideUp 0.6s ease-out;
-        }
-
-        .float-animation {
-          animation: float 3s ease-in-out infinite;
-        }
-
-        .success-animation {
-          animation: successPulse 0.5s ease-out;
-        }
-
-        .tag-item {
-          transition: all 0.2s ease;
-        }
-
-        .tag-item:hover {
-          transform: translateY(-2px);
-        }
-      `}</style>
-
       {/* Success Notification */}
       {showSuccess && (
         <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-auto z-50 bg-white rounded-xl shadow-2xl p-4 sm:p-6 flex items-center gap-3 success-animation border-2 border-green-500">
