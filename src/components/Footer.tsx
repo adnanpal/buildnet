@@ -39,7 +39,7 @@ function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-          © 2025 BuildNet. Made with❤️by Adnan Pal
+          © 2026 BuildNet. Made with❤️by Adnan Pal
         </div>
       </div>
     </footer>

@@ -92,7 +92,7 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-4 sm:p-6 mb-4 border border-gray-100">
+    <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-4 sm:p-4 mb-4 border border-gray-100">
       {/* Author Header */}
       <div className="flex items-start justify-between mb-4 gap-2">
         <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -159,27 +159,27 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
       </div>
 
       {/* Post Stats and Actions */}
-      <div className="flex items-center justify-between border-t border-gray-200 sm:flex-row sm:items-center sm:justify-between sm:gap-0 pt-3 sm:pt-4">
+      <div className="flex flex-row gap-3 border-t border-gray-200 pt-3 sm:pt-4 sm:flex-row  sm:items-center sm:justify-between">
         {/* Stats */}
-        <div className="flex items-center gap-4 sm:gap-6 text-gray-500">
+        <div className="flex items-center gap-3 sm:gap-6 text-gray-500">
           <button
             onClick={() => onVote(post.id)}
-            className={`flex items-center gap-2 transition hover:scale-110 ${post.voted ? 'text-purple-600' : 'hover:text-purple-600'}`}
+            className={`flex items-center gap-1.5 sm:gap-2 transition hover:scale-110 ${post.voted ? 'text-purple-600' : 'hover:text-purple-600'}`}
           >
-            <ArrowUp className={`w-5 h-5 sm:w-5 sm:h-5 ${post.voted ? 'fill-current' : ''}`} />
+            <ArrowUp className={`w-4 h-4 sm:w-5 sm:h-5 ${post.voted ? 'fill-current' : ''}`} />
             <span className="font-bold text-sm sm:text-base">{post.votes}</span>
           </button>
 
-          <div className="flex items-center gap-2 sm:gap-2">
-            <div className="p-2 rounded-lg hover:bg-gray-100 transition">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 transition">
               <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <span className="font-semibold sm:text-base">{post.comments}</span>
+            <span className="text-sm font-semibold sm:text-base">{post.comments}</span>
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
             <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="sm:text-base font-semibold">{post.views}</span>
+            <span className="text-sm sm:text-base font-semibold">{post.views}</span>
           </div>
         </div>
 
@@ -188,15 +188,15 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
           <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={() => onBookmark(post.id)}
-              className={`p-2 sm:p-3 rounded-xl transition hover:scale-110 ${post.bookmarked
+              className={`p-2 sm:p-2.5 rounded-xl transition hover:scale-110 ${post.bookmarked
                 ? 'bg-purple-100 text-purple-600'
                 : 'hover:bg-gray-100 text-gray-400'
                 }`}
             >
-              <Bookmark className={`w-5 h-5 sm:w-5 sm:h-5 ${post.bookmarked ? 'fill-current' : ''}`} />
+              <Bookmark className={`w-4 h-4 sm:w-5 sm:h-5${post.bookmarked ? 'fill-current' : ''}`} />
             </button>
 
-            <button className="p-2 hover:bg-gray-100 rounded-xl transition hover:scale-110 text-gray-400">
+            <button className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-xl transition hover:scale-110 text-gray-400">
               <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
@@ -206,7 +206,7 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
               setOpen(true);
               setSelectedUserId(post.author.id);
             }}
-            className="px-5 py-2 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold hover:shadow-xl transition hover:scale-105">
+            className="px-4 py-2 sm:px-5 sm:py-2.5 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold hover:shadow-xl transition hover:scale-105 text-sm sm:text-base whitespace-nowrap">
             Collaborate
           </button>
           <BuildNetDialog
