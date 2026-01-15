@@ -123,7 +123,7 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
 
       {/* Post Content */}
       <div className="mb-4 sm:mb-4">
-        <h2 className="text-xl sm:text-xl font-bold text-gray-900 mb-2 hover:text-purple-600 cursor-pointer transition line-clamp-2">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 hover:text-purple-600 cursor-pointer transition line-clamp-2">
           {post.title}
         </h2>
         <p className="text-gray-600 leading-relaxed mb-4 sm:mb-4 text-sm sm:text-base line-clamp-3">
@@ -204,7 +204,7 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
         setOpen(true);
         setSelectedUserId(post.author.id);
       }}
-      className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg sm:rounded-xl font-bold hover:shadow-xl transition hover:scale-105 text-xs sm:text-base whitespace-nowrap">
+      className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-lg sm:rounded-xl font-bold hover:shadow-xl transition hover:scale-105 text-xs sm:text-base whitespace-nowrap">
       Collaborate
     </button>
           <BuildNetDialog
