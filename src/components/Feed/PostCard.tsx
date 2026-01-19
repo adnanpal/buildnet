@@ -39,6 +39,7 @@ interface PostCardProps {
 export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }: PostCardProps) {
   const [open, setOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [expanded,setExpanded] = useState(false);
 
   const handleSendRequest = async () => {
     console.log("🔍 handleSendRequest called");
@@ -128,9 +129,17 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
         <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 hover:text-purple-600 cursor-pointer transition line-clamp-2">
           {post.title}
         </h2>
-        <p className="text-gray-600 leading-relaxed mb-4 sm:mb-4 text-sm sm:text-base line-clamp-3">
+        <p className={`text-gray-600 leading-relaxed mb-4 sm:mb-4 text-sm sm:text-base transition-all ${expanded ? "":"line-clamp-3"}`}>
           {post.description}
         </p>
+        
+       {post.description.length > 120 && (
+        <button
+        onClick={()=>setExpanded(!expanded)}
+           className="text-purple-600 text-sm mb-4 font-semibold hover:underline">
+          {expanded ? "Read less" : "Read more"}
+        </button>
+       )}
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 sm:gap-2 mb-3 sm:mb-4">
