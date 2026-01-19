@@ -1,4 +1,4 @@
-import { Lightbulb, Bell, Plus, Menu, X, Home, TrendingUp, FolderKanban, User, LogOut, Settings } from 'lucide-react';
+import { Lightbulb, Bell, Plus, Menu, X, Home, TrendingUp, FolderKanban, User, LogOut, Settings, BookMarked } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useUser, useClerk } from "@clerk/clerk-react";
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +20,7 @@ export default function FeedNavbar() {
     const activeTab =
         location.pathname === "/" ? "feed" :
             location.pathname === "/trending" ? "trending" :
+              location.pathname === "/saved-projects" ? "saved-projects" :
                 location.pathname.startsWith("/my-project") ? "projects" :
                     "";
 
@@ -121,6 +122,17 @@ export default function FeedNavbar() {
                                     >
                                         My Projects
                                     </button>
+                                     <button
+                                        onClick={() => navigate("/saved-projects")}
+
+                                        className={`nav-tab px-5 py-2 rounded-xl font-semibold transition-all duration-200 ${activeTab === 'saved-projects'
+                                            ? 'active text-purple-600'
+                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        Saved Projects
+                                    </button>
+                                    
                                 </div>
 
 
@@ -356,6 +368,19 @@ export default function FeedNavbar() {
                                     >
                                         <TrendingUp className="w-5 h-5" />
                                         <span>Trending</span>
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            navigate("/saved-projects");
+                                            setMobileMenuOpen(false);
+                                        }}
+                                        className={`menu-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition ${activeTab === 'saved-projects'
+                                            ? 'bg-linear-to-r from-purple-100 to-blue-100 text-purple-700 font-semibold shadow-sm'
+                                            : 'text-gray-700 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <BookMarked className="w-5 h-5" />
+                                        <span>Saved Projects</span>
                                     </button>
 
                                     <button

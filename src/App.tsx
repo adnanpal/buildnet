@@ -10,6 +10,7 @@ import Trending from "./components/Feed/Trending";
 import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 import useAppUser from "./hooks/useAppUser";
 import "./styles/app.css";
+import SavedProjects from "./components/Feed/SavedProjects";
 
 function App() {
    
@@ -73,6 +74,7 @@ function App() {
               <Route path="/" element={<FeedMain />} />
               <Route path="/trending" element={<Trending />} />
               <Route path="/my-projects" element={<MyProjects />} />
+              <Route path="/saved-projects" element={<SavedProjects />} />
             </Route>
 
             {/* Routes WITHOUT Layout (Navbar) */}
