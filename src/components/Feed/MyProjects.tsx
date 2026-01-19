@@ -37,7 +37,7 @@ export default function MyProjects() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-3">
               <div className="animate-slide-up">
                 {posts.map((post, index) => (
                   <div key={post.id} style={{ animationDelay: `${index * 0.1}s` }}>
@@ -45,6 +45,7 @@ export default function MyProjects() {
                       post={post}
                       onVote={handleVote}
                       onBookmark={handleBookmark}
+                      variant="my-projects"
                     />
                   </div>
                 ))}

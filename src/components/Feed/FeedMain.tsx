@@ -115,6 +115,7 @@ function handleFilterChange(value:string){
                       post={post}
                       onVote={handleVote}
                       onBookmark={handleBookmark}
+                      variant="feed"
                     />
                   </div>
                 ))}

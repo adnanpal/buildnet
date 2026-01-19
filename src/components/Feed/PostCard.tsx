@@ -32,9 +32,11 @@ interface PostCardProps {
   post: Post;
   onVote: (postId: number) => void;
   onBookmark: (postId: number) => void;
+  variant?: "feed"|"my-projects";
+  onDelete?: (postId: number) => void;
 }
 
-export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
+export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }: PostCardProps) {
   const [open, setOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
@@ -198,7 +200,8 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
     <button className="p-1.5 sm:p-2.5 hover:bg-gray-100 rounded-xl transition hover:scale-110 text-gray-400">
       <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
     </button>
-
+    
+    {variant === "feed"?(
     <button
       onClick={() => {
         setOpen(true);
@@ -207,10 +210,23 @@ export function PostCard({ post, onVote, onBookmark }: PostCardProps) {
       className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-lg sm:rounded-xl font-bold hover:shadow-xl transition hover:scale-105 text-xs sm:text-base whitespace-nowrap">
       Collaborate
     </button>
+  ):(
+    <>
+            <button
+              onClick={() => setOpen(true)}
+              className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-linear-to-r from-red-500 to-red-600 text-white rounded-lg sm:rounded-xl font-bold hover:shadow-xl transition hover:scale-105 text-xs sm:text-base whitespace-nowrap"
+            >
+              Delete
+            </button>
+
+          </>
+          )}
+
           <BuildNetDialog
             open={open}
+            variant={variant}
             onClose={() => setOpen(false)}
-            onConfirm={handleSendRequest}
+            onConfirm={variant==="feed"?handleSendRequest:()=>onDelete?.(post.id)}
           />
         </div>
       </div>
