@@ -27,7 +27,10 @@ export default function FollowRequestNotifications(){
          setRequests(prev => prev.filter(r => r.id !== id));
     };
     
-   if (loading) return <p className="text-center py-10">Loading...</p>;
+   if (loading) return <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mt-10 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
    if (requests.length === 0) {
     return (
       <p className="text-center py-10 text-gray-500">

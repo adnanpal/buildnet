@@ -138,7 +138,7 @@ export default function FeedNavbar() {
 
                                 {/* Desktop Right Section */}
                                 <div className="hidden lg:flex items-center space-x-3">
-                                    <button className="p-2.5 hover:bg-linear-to-br hover:from-gray-50 hover:to-gray-100 rounded-xl transition-all group relative">
+                                    <button className="p-2.5 hover:bg-linear-to-br hover:from-gray-50 hover:to-gray-100 rounded-xl transition-all group relative" onClick={() => navigate("/notifications")}>
                                         <Bell className="w-6 h-6 text-gray-600 group-hover:text-purple-600 transition-colors" />
                                         <span className="absolute top-1 right-1 min-w-3 h-3 px-1 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">
                                             3
@@ -238,7 +238,7 @@ export default function FeedNavbar() {
 
                                 {/* Mobile Right Section */}
                                 <div className="flex lg:hidden items-center space-x-2">
-                                    <button className="p-2 hover:bg-gray-50 rounded-xl transition-all relative" onClick={()=>{navigate("/notifications")}}>
+                                    <button className="p-2.5 min-w-11 min-h-11 flex items-center justify-center hover:bg-gray-50 rounded-xl transition-all relative" onClick={()=>{navigate("/notifications")}}>
                                         <Bell className="w-5 h-5 text-gray-600" />
                                         <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
                                     </button>

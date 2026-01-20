@@ -40,9 +40,6 @@ export default function useConnectionRequests(
                     },
                 }));
                 
-               
-
-
                 setRequests(formatted);
             }catch(err){
                 console.error("Failed To Fetch Connection Requests",err);
