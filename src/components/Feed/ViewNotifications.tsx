@@ -39,11 +39,12 @@ export default function FollowRequestNotifications(){
     );
   }
    return (
-    <div className="max-w-4xl mx-auto py-8 space-y-4">
-      <h1 className="text-2xl font-bold text-gray-800">
+    <div className="top-0 left-0 right-0 z-50 px-3 sm:px-4 lg:px-6 pt-6 sm:pt-4">
+        
+      <h1 className="text-xl text-center font-bold text-gray-800">
         Follow Requests
       </h1>
-
+       <div className="animate-slide-up">
       {requests.map(req => (
         <NotificationCard
           key={req.id}
@@ -57,5 +58,7 @@ export default function FollowRequestNotifications(){
         />
       ))}
     </div>
+    </div>
+ 
   );
 }
