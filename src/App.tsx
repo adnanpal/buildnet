@@ -11,6 +11,7 @@ import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 import useAppUser from "./hooks/useAppUser";
 import "./styles/app.css";
 import SavedProjects from "./components/Feed/SavedProjects";
+import ViewNotifications from "./components/Feed/ViewNotifications";
 
 function App() {
    
@@ -75,6 +76,7 @@ function App() {
               <Route path="/trending" element={<Trending />} />
               <Route path="/my-projects" element={<MyProjects />} />
               <Route path="/saved-projects" element={<SavedProjects />} />
+              <Route path="/notifications" element={<ViewNotifications />} />
             </Route>
 
             {/* Routes WITHOUT Layout (Navbar) */}

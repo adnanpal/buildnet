@@ -15,32 +15,37 @@ export default function FeedMain() {
     setPosts,
     handleBookmark,
     allPosts,
-  } = useFetch("/api/posts?populate=author");
+  } = useFetch("/api/posts?populate=author&populate=app_user");
 
   const { data, search, reset } = useSearch(
     "/api/posts?populate[author][populate]=*&filters[title][$containsi]="
   );
 
- useEffect(() => {
+useEffect(() => {
   if (!data?.data) return;
 
   const formatted = data.data.map((item: any) => {
     const attr = item.attributes ?? item;
     
     
+    const appUserData = attr.app_user?.data ?? attr.app_user ?? null;
+    const appUserAttr = appUserData?.attributes ?? appUserData ?? null;
+    
+    
     const authorData = attr.author?.data ?? attr.author ?? null;
     const authorAttr = authorData?.attributes ?? authorData ?? null;
     
-   
     const authorId = 
       authorData?.id ?? 
       attr.author?.data?.id ?? 
       attr.author?.id ?? 
       null;
 
-    console.log("🔍 Debugging author:", {
+    console.log("🔍 FeedMain - Debugging:", {
       authorData,
       authorId,
+      appUserData,
+      appUserClerkId: appUserAttr?.clerkUserId,
       fullAuthorObject: attr.author
     });
 
@@ -64,11 +69,15 @@ export default function FeedMain() {
         title: authorAttr?.title ?? "",
         avatar: authorAttr?.avatar ?? "?",
         verified: authorAttr?.verified ?? false,
+        clerkUserId: authorAttr?.clerkUserId ?? "",
+      },
+      app_user: {
+        clerkUserId: appUserAttr?.clerkUserId ?? "",
       },
     };
   });
 
-  console.log("✅ Final formatted posts:", formatted);
+  console.log("✅ FeedMain - Final formatted posts:", formatted);
   setPosts(formatted);
 }, [data, setPosts]);
 

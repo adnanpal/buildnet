@@ -238,7 +238,7 @@ export default function FeedNavbar() {
 
                                 {/* Mobile Right Section */}
                                 <div className="flex lg:hidden items-center space-x-2">
-                                    <button className="p-2 hover:bg-gray-50 rounded-xl transition-all relative">
+                                    <button className="p-2 hover:bg-gray-50 rounded-xl transition-all relative" onClick={()=>{navigate("/notifications")}}>
                                         <Bell className="w-5 h-5 text-gray-600" />
                                         <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
                                     </button>

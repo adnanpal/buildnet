@@ -3,6 +3,8 @@ type PostStatus = "seeking-collaborators" | "in-progress" | "launched";
 import BuildNetDialog from "../modals/BuildNetDialog";
 import { useState } from "react";
 import api from "../../api/axios";
+import { useUser } from "@clerk/clerk-react";
+
 
 export interface Post {
   id: number;
@@ -25,7 +27,11 @@ export interface Post {
     avatar: string;
     verified: boolean;
     title: string;
+    clerkUserId: string;  
   };
+  app_user: {
+  clerkUserId: string;
+};
 }
 
 interface PostCardProps {
@@ -38,43 +44,65 @@ interface PostCardProps {
 
 export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }: PostCardProps) {
   const [open, setOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedClerkUserId, setSelectedClerkUserId] = useState<string | null>(null);
+  const { user } = useUser();
+
+
   const [expanded,setExpanded] = useState(false);
 
+
   const handleSendRequest = async () => {
-    console.log("🔍 handleSendRequest called");
-    console.log("📍 selectedUserId:", selectedUserId);
-    console.log("📍 fromUserId:", localStorage.getItem("appUserId"));
-    try {
-      const fromUserId = localStorage.getItem("appUserId");
+  try {
+    const fromClerkUserId = user?.id;
+    console.log("from user id",fromClerkUserId);
+    console.log("selected user id",selectedClerkUserId);
 
-      if (!fromUserId || !selectedUserId) {
-        alert("Missing user information");
-        return;
-      }
-
-      if (Number(fromUserId) === selectedUserId) {
-        alert("You cannot send request to yourself");
-        return;
-      }
-
-      const res = await api.post("/api/connection-requests", {
-        data: {
-          fromUser: Number(fromUserId),
-          toUser: selectedUserId,
-          connectionStatus: "pending",
-        },
-      });
-
-      console.log("✅ API RESPONSE:", res.data);
-      alert("Connection request sent");
-      setOpen(false);
-
-    } catch (err: any) {
-      console.error("❌ API ERROR:", err.response?.data || err);
-      alert("Failed to send request: " + (err.response?.data?.error?.message || err.message));
+    if (!fromClerkUserId || !selectedClerkUserId) {
+      alert("Missing user information");
+      return;
     }
-  };
+    if (!post.app_user?.clerkUserId) {
+      alert("This user is not linked to an account yet");
+      return;
+    }
+
+    if (fromClerkUserId === selectedClerkUserId) {
+      alert("You cannot send request to yourself");
+      return;
+    }
+
+    // Resolve FROM user
+    const fromRes = await api.get(
+      `/api/app-users?filters[clerkUserId][$eq]=${fromClerkUserId}`
+    );
+    const fromUser = fromRes.data.data[0];
+    if (!fromUser) throw new Error("From user not found");
+
+    // Resolve TO user
+    const toRes = await api.get(
+      `/api/app-users?filters[clerkUserId][$eq]=${selectedClerkUserId}`
+    );
+    const toUser = toRes.data.data[0];
+    if (!toUser) throw new Error("Target user not found");
+
+    // Create request
+    await api.post("/api/connection-requests", {
+      data: {
+        fromUser: fromUser.id,
+        toUser: toUser.id,
+        connectionStatus: "pending",
+      },
+    });
+
+    alert("Connection request sent");
+    setOpen(false);
+
+  } catch (err: any) {
+    console.error(err);
+    alert(err.message);
+  }
+};
+
 
   const statusConfig = {
     'seeking-collaborators': {
@@ -214,7 +242,8 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
     <button
       onClick={() => {
         setOpen(true);
-        setSelectedUserId(post.author.id);
+        console.log("Clicked author:", post.author);
+        setSelectedClerkUserId(post.app_user.clerkUserId);
       }}
       className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-lg sm:rounded-xl font-bold hover:shadow-xl transition hover:scale-105 text-xs sm:text-base whitespace-nowrap">
       Collaborate
