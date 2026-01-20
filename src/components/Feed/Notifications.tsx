@@ -37,9 +37,9 @@ export default function NotificationCard({
   };
 
   return (
-    <div className="container mx-auto mt-6 bg-white rounded-xl sm:rounded-2xl 
-    border-l-2 border-purple-500 shadow-xl h-auto sm:h-20 lg:h-24 
-    flex items-center px-3 sm:px-4 py-3 sm:py-0">
+    <div className="container mx-auto mt-6 h-auto  bg-white gradient-border glassmorphism rounded-2xl 
+border-t-2 border-purple-500 shadow-purple-500/10 shadow-xl sm:h-20 lg:h-24 
+    flex items-center left-0 right-0  px-3 sm:px-4 py-3 sm:py-0">
 
       
       <div className="ml-0 sm:ml-2 lg:ml-4 w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 
