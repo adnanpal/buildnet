@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Lightbulb, Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-react';
 import {  useSignIn } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 
 interface LoginPageProps {
@@ -44,7 +45,7 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
       navigate("/profile");
     }
   } catch (err: any) {
-    console.error("Login failed:", err.errors?.[0]?.message);
+    toast.error("Login failed,Retry With Google!");
 
     // Optional UX hint
     if (
