@@ -20,6 +20,7 @@ export interface Post {
   status: PostStatus;
   voted: boolean;
   bookmarked: boolean;
+  documentId: string; 
 
   author: {
     id: number,
@@ -39,7 +40,7 @@ interface PostCardProps {
   onVote: (postId: number) => void;
   onBookmark: (postId: number) => void;
   variant?: "feed"|"my-projects";
-  onDelete?: (postId: number) => void;
+  onDelete?:(documentId: string) => void;
 }
 
 export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }: PostCardProps) {
@@ -264,7 +265,7 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
             open={open}
             variant={variant}
             onClose={() => setOpen(false)}
-            onConfirm={variant==="feed"?handleSendRequest:()=>onDelete?.(post.id)}
+            onConfirm={variant==="feed"?handleSendRequest:()=>{onDelete?.(post.documentId);setOpen(false);}}
           />
         </div>
       </div>

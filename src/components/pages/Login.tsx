@@ -33,31 +33,32 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
   if (!isLoaded) return;
 
   try {
-   
-    const signInAttempt = await signIn.create({
+    const result = await signIn.create({
       identifier: email,
-    });
-
-    const result = await signInAttempt.attemptFirstFactor({
-      strategy: "password",
       password,
+         
     });
 
     if (result.status === "complete") {
       await setActive({ session: result.createdSessionId });
-      navigate("/");
+      navigate("/profile");
     }
-
   } catch (err: any) {
-    console.error("Login Failed:", err.errors?.[0]?.message);
+    console.error("Login failed:", err.errors?.[0]?.message);
+
+    // Optional UX hint
+    if (
+      err.errors?.[0]?.message?.toLowerCase().includes("identifier")
+    ) {
+      alert(
+        "This account may have been created using Google or GitHub. Please sign in with that provider."
+      );
+    }
   }
 };
 
 
-  const handleSocialLogin = (provider: string) => {
-    console.log(`Login with ${provider}`);
-    alert(`Logging in with ${provider}...`);
-  };
+ 
 
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -124,7 +125,7 @@ function LoginPage({ onSwitchToSignup }: LoginPageProps) {
               </button>
 
             <button
-              onClick={() => handleSocialLogin('GitHub')}
+              onClick={() => handleOAuthLogin("oauth_github")}
               className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
             >
               <Github className="w-5 h-5" />

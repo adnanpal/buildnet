@@ -38,6 +38,7 @@ export default function useFetch(url: string | null) {
           return {
             id: item.id,
             title: attr.title,
+            documentId: item.documentId,
             description: attr.description,
             category: attr.category,
             tags: attr.tags || [],
@@ -85,19 +86,32 @@ export default function useFetch(url: string | null) {
     fetchPosts();
   }, [url]);
 
-  const handleVote = (postId: number) => {
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === postId
-          ? {
-            ...post,
-            voted: !post.voted,
-            votes: post.voted ? post.votes - 1 : post.votes + 1,
-          }
-          : post
-      )
-    );
-  };
+  const handleVote = async(postId:number)=>{
+    let previousPosts: Post[] = [];
+
+    setPosts((prev)=>{
+      previousPosts = prev;
+
+      return prev.map((post)=>
+      post.id === postId?
+    {
+      ...post,
+      voted: !post.voted,
+      votes: post.voted ? post.votes - 1 : post.votes + 1,
+    
+    }:post);
+
+  });
+
+  try{
+    await api.post(`/api/posts/${postId}/vote`,{
+      vote: true,
+    });
+  }catch(error){
+    console.error("Vote Failed, revoking UI",error);
+    setPosts(previousPosts);
+  }
+}
 
   const handleBookmark = (postId: number) => {
     setPosts((prev) =>
@@ -109,12 +123,29 @@ export default function useFetch(url: string | null) {
     );
   };
 
+  const handleDelete = async(documentId: string)=>{
+    try{
+      await api.delete(`/api/posts/${documentId}`);
+
+      setPosts((prev)=>
+        prev.filter((post)=> post.documentId !== documentId)
+    );
+
+    alert("Post Deleted Successfully!")
+
+    }catch(error){
+      console.error("Failed to delete post", error);
+      alert("Failed To Delete Post, Try Again!");
+    }
+  }
+
   return {
     posts,
     loading,
     allPosts,
     setPosts,
     handleVote,
+    handleDelete,
     handleBookmark,
   };
 }

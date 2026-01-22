@@ -7,7 +7,7 @@ import "../../styles/myprojects.css";
 export default function MyProjects() {
   const { appUserId, isLoaded } = useAppUser();
 
-  const { posts, loading, handleVote, handleBookmark } = useFetch(
+  const { posts, loading, handleVote, handleBookmark,handleDelete } = useFetch(
     isLoaded && appUserId
       ? `/api/posts?filters[app_user][id][$eq]=${appUserId}&populate=*`
       : null
@@ -44,6 +44,7 @@ export default function MyProjects() {
                     <PostCard
                       post={post}
                       onVote={handleVote}
+                      onDelete={handleDelete}
                       onBookmark={handleBookmark}
                       variant="my-projects"
                     />
