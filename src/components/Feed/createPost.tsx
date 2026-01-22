@@ -4,6 +4,7 @@ import { Lightbulb, X, Plus, Sparkles, Users, FileText, Tag, Layers, CheckCircle
 import { useUser } from "@clerk/clerk-react";
 import api from "../../api/axios";
 import "../../styles/post.css";
+import { toast } from "react-toastify";
 
 export default function CreatePost() {
   const { createPost } = usePost();
@@ -113,7 +114,7 @@ export default function CreatePost() {
     const success = await createPost(payload);
 
     if (success) {
-      alert("Post created successfully!");
+      toast.success("Post Created Successfully!");
 
       setTimeout(() => {
         setShowSuccess(false);

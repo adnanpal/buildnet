@@ -3,6 +3,7 @@ import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { calculateCompletion } from "../components/profilesection/profileHeader";
 import api from "../api/axios";
+import { toast } from "react-toastify";
 
 export function useProfile(appUserId: number | null) {
     const { user } = useUser();
@@ -184,7 +185,7 @@ export function useProfile(appUserId: number | null) {
 
             // 🟢 CONNECT SPECIALIZATION (OWNER SIDE)
 
-            alert("Profile saved successfully");
+            toast.success("Profile Created Successfully!");
             await user.update({
                 unsafeMetadata: { profileCompleted: true },
             });
@@ -192,7 +193,7 @@ export function useProfile(appUserId: number | null) {
 
         } catch (err: any) {
             console.error("❌ Save failed", err.response?.data || err);
-            alert("Profile save failed");
+            toast.error("Profile save failed");
         } finally {
             setLoading(false);
         }

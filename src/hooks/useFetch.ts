@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import type { Post } from "../components/Feed/PostCard";
 import api from "../api/axios";
+import { toast } from "react-toastify";
 
 export default function useFetch(url: string | null) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!url) {
@@ -124,6 +126,8 @@ export default function useFetch(url: string | null) {
   };
 
   const handleDelete = async(documentId: string)=>{
+     if (deleting) return;
+       setDeleting(true);
     try{
       await api.delete(`/api/posts/${documentId}`);
 
@@ -131,11 +135,15 @@ export default function useFetch(url: string | null) {
         prev.filter((post)=> post.documentId !== documentId)
     );
 
-    alert("Post Deleted Successfully!")
+     toast.success("Project deleted successfully 🚀");
 
     }catch(error){
+
       console.error("Failed to delete post", error);
-      alert("Failed To Delete Post, Try Again!");
+      toast.error("Failed to delete project ❌");
+
+    }finally{
+      setDeleting(false);
     }
   }
 

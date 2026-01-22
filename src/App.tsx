@@ -12,10 +12,12 @@ import useAppUser from "./hooks/useAppUser";
 import "./styles/app.css";
 import SavedProjects from "./components/Feed/SavedProjects";
 import ViewNotifications from "./components/Feed/ViewNotifications";
+import "react-toastify/dist/ReactToastify.css";
+import { Bounce, ToastContainer } from "react-toastify";
 
 function App() {
-   
-   const { isLoaded,user } = useAppUser();
+
+  const { isLoaded, user } = useAppUser();
 
   // ⏳ Show loading state while Clerk is initializing
   if (!isLoaded) {
@@ -40,7 +42,7 @@ function App() {
         ===================================================== */}
         <Route
           path="/sso-callback"
-          element={<AuthenticateWithRedirectCallback/>}
+          element={<AuthenticateWithRedirectCallback />}
         />
 
         {/* =====================================================
@@ -88,6 +90,19 @@ function App() {
           </>
         )}
       </Routes>
+      <ToastContainer
+        position="top-center"
+        autoClose={1300}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
     </div>
   );
 }
