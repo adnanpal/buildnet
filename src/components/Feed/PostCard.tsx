@@ -69,7 +69,7 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
     }
 
     if (fromClerkUserId === selectedClerkUserId) {
-      alert("You cannot send request to yourself");
+      toast.error("You cannot send request to yourself");
       return;
     }
 
