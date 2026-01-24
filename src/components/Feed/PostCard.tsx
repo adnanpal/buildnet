@@ -5,6 +5,7 @@ import { useState } from "react";
 import api from "../../api/axios";
 import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 
 export interface Post {
@@ -57,8 +58,6 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
   const handleSendRequest = async () => {
   try {
     const fromClerkUserId = user?.id;
-    console.log("from user id",fromClerkUserId);
-    console.log("selected user id",selectedClerkUserId);
 
     if (!fromClerkUserId || !selectedClerkUserId) {
       alert("Missing user information");
@@ -87,7 +86,21 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
     );
     const toUser = toRes.data.data[0];
     if (!toUser) throw new Error("Target user not found");
+  
+    const existingRequestRes = await api.get(`/api/connection-requests?filters[$or][0][fromUser][$eq]=${fromUser.id}&filters[$or][0][toUser][$eq]=${toUser.id}&filters[$or][1][fromUser][$eq]=${toUser.id}&filters[$or][1][toUser][$eq]=${fromUser.id}`);
+    if(existingRequestRes.data.data && existingRequestRes.data.data.length > 0){
+      const existingRequest = existingRequestRes.data.data[0];
+      const status = existingRequest.attributes?.connectionStatus || existingRequest.connectionStatus;
 
+      if (status === "accepted"){
+        toast.info("You are already connected with this user");
+      }else if(status === "pending"){
+        toast.info("Connection request is already pending");
+      }else if(status === "rejected"){
+        toast.info("Your previous connection request was rejected");
+      }
+      return;
+    }
     // Create request
     await api.post("/api/connection-requests", {
       data: {
@@ -97,7 +110,7 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
       },
     });
 
-    alert("Connection request sent");
+  toast.success("Connection request sent");
     setOpen(false);
 
   } catch (err: any) {
@@ -251,6 +264,7 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
         setOpen(true);
         console.log("Clicked author:", post.author);
         setSelectedClerkUserId(post.app_user.clerkUserId);
+      
       }}
       className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-lg sm:rounded-xl font-bold hover:shadow-xl transition hover:scale-105 text-xs sm:text-base whitespace-nowrap">
       Collaborate
