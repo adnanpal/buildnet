@@ -94,10 +94,16 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
 
       if (status === "accepted"){
         toast.info("You are already connected with this user");
+        setOpen(false);
+        return;
       }else if(status === "pending"){
         toast.info("Connection request is already pending");
+        setOpen(false);
+        return;
       }else if(status === "rejected"){
         toast.info("Your previous connection request was rejected");
+        setOpen(false);
+        return;
       }
       return;
     }
