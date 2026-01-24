@@ -5,15 +5,33 @@ import { useUser } from "@clerk/clerk-react";
 import api from "../../api/axios";
 import "../../styles/post.css";
 import { toast } from "react-toastify";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function CreatePost() {
-  const { createPost } = usePost();
+  const { createPost, updatePost } = usePost();
   const [authorId, setAuthorId] = useState<number | null>(null);
   const appUserId = localStorage.getItem("appUserId");
   const { user } = useUser();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const editingPost = location.state?.editingPost;
+  const [isEditing] = useState(!!editingPost)
 
   useEffect(() => {
     if (!user?.id) return;
+
+    if(editingPost){
+      setFormData({
+        name: editingPost.author?.name || '',
+        title: editingPost.title || '',
+        description: editingPost.description || '',
+        tags: editingPost.tags || [],
+        seekingRoles: editingPost.seeking || [],
+        statuss: editingPost.statuss || '',
+        category: editingPost.category || ''
+      });
+    }
+      
 
     const fetchAuthor = async () => {
       try {
@@ -32,7 +50,7 @@ export default function CreatePost() {
     };
 
     fetchAuthor();
-  }, [user]);
+  }, [user, editingPost]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -47,6 +65,7 @@ export default function CreatePost() {
   const [currentTag, setCurrentTag] = useState('');
   const [currentRole, setCurrentRole] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  
 
   const statusOption = [
   { value: 'seeking-collaborators', label: 'Seeking Collaborators', color: 'bg-green-500' }, // Fixed: 'seeking' not 'seeling'
@@ -86,8 +105,8 @@ export default function CreatePost() {
     setFormData({ ...formData, seekingRoles: formData.seekingRoles.filter(role => role !== roleToRemove) });
   };
 
-  // ✅ Load authorId from localStorage
-
+ 
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -111,11 +130,20 @@ export default function CreatePost() {
       app_user:appUserId
     };
 
-    const success = await createPost(payload);
+    let success;
+    if (isEditing && editingPost){
+      success = await updatePost(editingPost.documentId, payload);
+      if(success){
+        toast.success("Post Updated Successfully!");
+      }
+    }else{
+      success = await createPost(payload);
+      if(success){
+        toast.success("Post Created Successfully!");
+    }
+  }
 
     if (success) {
-      toast.success("Post Created Successfully!");
-
       setTimeout(() => {
         setShowSuccess(false);
         setFormData({
@@ -127,6 +155,9 @@ export default function CreatePost() {
           statuss: '',
           category: ''
         });
+        if(!isEditing){
+          navigate("/my-projects");
+        }
       }, 2000);
     }
   };
@@ -155,7 +186,7 @@ export default function CreatePost() {
             </div>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-2 sm:mb-3 px-2">
-            Share Your <span className="bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Project Idea</span>
+             {isEditing ? 'Update Your' : 'Share Your'} <span className="bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Project Idea</span>
           </h1>
           <p className="text-base sm:text-lg text-gray-600 px-4">Fill in the details and find the perfect collaborators</p>
         </div>
@@ -391,7 +422,7 @@ export default function CreatePost() {
                 disabled={!formData.name || !formData.title || !formData.description || !formData.statuss || formData.tags.length === 0}
                 className="w-full sm:flex-1 px-6 sm:px-8 py-3 sm:py-4 rounded-lg sm:rounded-xl bg-linear-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-2xl transition disabled:opacity-50 disabled:cursor-not-allowed text-base sm:text-lg active:scale-95"
               >
-                Post Project
+                {isEditing ? 'Update Project' : 'Publish Project'}
               </button>
             </div>
           </div>

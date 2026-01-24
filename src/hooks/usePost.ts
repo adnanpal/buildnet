@@ -34,6 +34,23 @@ export function usePost() {
       setLoading(false);
     }
   };
+  const updatePost = async (documentId: string, payload: any) => {
+    try{
+      setLoading(true);
+      setError("");
 
-  return { createPost, loading, error };
+      await api.put(
+        `/api/posts/${documentId}`,
+        {data:payload},
+      );
+      return true;
+    } catch (err) {
+      setError("Failed to update post");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return { createPost, updatePost, loading, error };
 }

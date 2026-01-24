@@ -125,6 +125,7 @@ export default function useFetch(url: string | null) {
     );
   };
 
+ 
   const handleDelete = async(documentId: string)=>{
      if (deleting) return;
        setDeleting(true);

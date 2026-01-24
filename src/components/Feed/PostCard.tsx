@@ -4,6 +4,7 @@ import BuildNetDialog from "../modals/BuildNetDialog";
 import { useState } from "react";
 import api from "../../api/axios";
 import { useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 
 
 export interface Post {
@@ -47,6 +48,7 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
   const [open, setOpen] = useState(false);
   const [selectedClerkUserId, setSelectedClerkUserId] = useState<string | null>(null);
   const { user } = useUser();
+  const navigate = useNavigate();
 
 
   const [expanded,setExpanded] = useState(false);
@@ -171,19 +173,21 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
        )}
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 sm:gap-2 mb-3 sm:mb-4">
-          {post.tags.map((tag, index) => (
-            <span
-              key={index}
-              className="px-2 sm:px-3 py-1 bg-gray-100 text-gray-700 text-xs sm:text-sm rounded-full hover:bg-purple-100 hover:text-purple-700 transition cursor-pointer"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
+        {variant === "feed" && (
+          <div className="flex flex-wrap gap-2 sm:gap-2 mb-3 sm:mb-4">
+            {post.tags.map((tag, index) => (
+              <span
+                key={index}
+                className="px-2 sm:px-3 py-1 bg-gray-100 text-gray-700 text-xs sm:text-sm rounded-full hover:bg-purple-100 hover:text-purple-700 transition cursor-pointer"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Seeking Collaborators */}
-        {post.seeking.length > 0 && (
+        {variant === "feed" && post.seeking.length > 0 && (
           <div className="flex items-center gap-2 p-3 bg-linear-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200">
             <Users className="w-5 h-5 text-purple-600 shrink-0" />
             <span className="text-sm font-bold text-purple-900 shrink-0">Seeking:</span>
@@ -201,30 +205,32 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
       {/* Post Stats and Actions */}
       <div className="flex items-center justify-between border-t border-gray-200 pt-3 sm:pt-4 gap-2">
   {/* Stats */}
-  <div className="flex items-center gap-2 sm:gap-6 text-gray-500">
-    <button
-      onClick={() => onVote(post.id)}
-      className={`flex items-center gap-1 sm:gap-2 transition hover:scale-110 ${post.voted ? 'text-purple-600' : 'hover:text-purple-600'}`}
-    >
-      <ArrowUp className={`w-4 h-4 sm:w-5 sm:h-5 ${post.voted ? 'fill-current' : ''}`} />
-      <span className="font-bold text-xs sm:text-base">{post.votes}</span>
-    </button>
+  {variant === "feed" && (
+    <div className="flex items-center gap-2 sm:gap-6 text-gray-500">
+      <button
+        onClick={() => onVote(post.id)}
+        className={`flex items-center gap-1 sm:gap-2 transition hover:scale-110 ${post.voted ? 'text-purple-600' : 'hover:text-purple-600'}`}
+      >
+        <ArrowUp className={`w-4 h-4 sm:w-5 sm:h-5 ${post.voted ? 'fill-current' : ''}`} />
+        <span className="font-bold text-xs sm:text-base">{post.votes}</span>
+      </button>
 
-    <div className="flex items-center gap-1 sm:gap-2">
-      <div className="p-1 sm:p-2 rounded-lg hover:bg-gray-100 transition">
-        <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+      <div className="flex items-center gap-1 sm:gap-2">
+        <div className="p-1 sm:p-2 rounded-lg hover:bg-gray-100 transition">
+          <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+        </div>
+        <span className="text-xs font-semibold sm:text-base">{post.comments}</span>
       </div>
-      <span className="text-xs font-semibold sm:text-base">{post.comments}</span>
-    </div>
 
-    <div className="flex items-center gap-1 sm:gap-2">
-      <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-      <span className="text-xs sm:text-base font-semibold">{post.views}</span>
+      <div className="flex items-center gap-1 sm:gap-2">
+        <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+        <span className="text-xs sm:text-base font-semibold">{post.views}</span>
+      </div>
     </div>
-  </div>
+  )}
 
   {/* Actions */}
-  <div className="flex items-center gap-1 sm:gap-2">
+  <div className="flex items-center gap-1 sm:gap-2 ml-auto">
     <button
       onClick={() => onBookmark(post.id)}
       className={`p-1.5 sm:p-2.5 rounded-xl transition hover:scale-110 ${post.bookmarked
@@ -251,7 +257,16 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
     </button>
   ):(
     <>
-            <button
+          
+             <button
+              onClick={() => {
+                navigate("/create",{state:{editingPost:post}});
+                setOpen(false)}}
+              className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-lg sm:rounded-xl font-bold hover:shadow-xl transition hover:scale-105 text-xs sm:text-base whitespace-nowrap"
+            >
+              Edit
+            </button>
+             <button
               onClick={() => setOpen(true)}
               className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-linear-to-r from-red-500 to-red-600 text-white rounded-lg sm:rounded-xl font-bold hover:shadow-xl transition hover:scale-105 text-xs sm:text-base whitespace-nowrap"
             >
