@@ -1,6 +1,6 @@
 import  { useState, useEffect } from 'react';
 
-const useTextRotation = (texts: string | any[], interval = 3000) => {
+const useTextRotation = (texts: string | any[], interval = 2000) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {

@@ -1,59 +1,140 @@
-  @keyframes float {
-
-      0%,
-      100% {
-          transform: translateY(0px);
-      }
-
-      50% {
-          transform: translateY(-20px);
-      }
+/* Animation Keyframes */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
   }
-
-  @keyframes pulse-slow {
-
-      0%,
-      100% {
-          opacity: 0.3;
-      }
-
-      50% {
-          opacity: 0.6;
-      }
+  50% {
+    transform: translateY(-20px);
   }
+}
 
-  @keyframes slide-up {
-      from {
-          opacity: 0;
-          transform: translateY(30px);
-      }
-
-      to {
-          opacity: 1;
-          transform: translateY(0);
-      }
+@keyframes float-mobile {
+  0%, 100% {
+    transform: translateY(0px);
   }
+  50% {
+    transform: translateY(-10px);
+  }
+}
 
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up-mobile {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Base Animation Classes */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.animate-on-scroll.visible {
+  animation: slide-up 0.6s ease-out forwards;
+}
+
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+.text-rotate-enter {
+  animation: slide-up 0.5s ease-out;
+}
+
+.hero-bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: pulse-slow 8s ease-in-out infinite;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+  /* Reduce animation intensity on mobile for better performance */
   .animate-on-scroll {
-      opacity: 0;
-      transform: translateY(30px);
+    transform: translateY(20px);
   }
 
   .animate-on-scroll.visible {
-      animation: slide-up 0.6s ease-out forwards;
+    animation: slide-up-mobile 0.5s ease-out forwards;
   }
 
   .floating {
-      animation: float 6s ease-in-out infinite;
+    animation: float-mobile 6s ease-in-out infinite;
   }
 
   .text-rotate-enter {
-      animation: slide-up 0.5s ease-out;
+    animation: slide-up-mobile 0.4s ease-out;
   }
 
+  /* Reduce blur on mobile for better performance */
   .hero-bg-circle {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      animation: pulse-slow 8s ease-in-out infinite;
+    filter: blur(60px);
   }
+
+  /* Disable expensive animations on very small screens */
+  @media (max-width: 375px) {
+    .hero-bg-circle {
+      animation: none;
+      opacity: 0.3;
+    }
+  }
+}
+
+/* Tablet Optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .hero-bg-circle {
+    filter: blur(70px);
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-on-scroll,
+  .floating,
+  .text-rotate-enter,
+  .hero-bg-circle {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .animate-on-scroll.visible {
+    animation: none;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Reduce hover effects on touch devices */
+  .hover\:-translate-y-1:hover {
+    transform: translateY(0);
+  }
+}

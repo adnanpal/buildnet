@@ -140,8 +140,7 @@ export default function FeedNavbar() {
                                 <div className="hidden lg:flex items-center space-x-3">
                                     <button className="p-2.5 hover:bg-linear-to-br hover:from-gray-50 hover:to-gray-100 rounded-xl transition-all group relative" onClick={() => navigate("/notifications")}>
                                         <Bell className="w-6 h-6 text-gray-600 group-hover:text-purple-600 transition-colors" />
-                                        <span className="absolute top-1 right-1 min-w-3 h-3 px-1 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">
-                                            
+                                        <span className="absolute top-1 right-1 min-w-2 h-2 px-1 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">   
                                         </span>
                                     </button>
 
