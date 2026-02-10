@@ -154,7 +154,7 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-gray-900 truncate">{post.author?.name ?? "Anonymous"}</h3>
+              <h3 className="font-bold text-gray-900 truncate">{post.author?.name?? "Anonymous"}</h3>
               {post.author?.verified && (
                 <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500 shrink-0" />
               )}
