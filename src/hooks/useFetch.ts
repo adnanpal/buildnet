@@ -40,7 +40,7 @@ export default function useFetch(url: string | null) {
           return {
             id: item.id,
             title: attr.title,
-            documentId: item.documentId,
+            documentId: attr.documentId ?? item.documentId ?? item.id,
             description: attr.description,
             category: attr.category,
             tags: attr.tags || [],
@@ -48,7 +48,7 @@ export default function useFetch(url: string | null) {
             comments: attr.comments ?? 0,
             views: attr.views ?? 0,
             seeking: attr.seeking || [],
-            status: attr.statuss,
+            status: attr.status ?? attr.statuss ?? "in-progress",
             timestamp: new Date(attr.createdAt).toDateString(),
             voted: false,
             bookmarked: false,

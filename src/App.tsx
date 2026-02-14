@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./components/Homepage";
 import Main from "./components/profilesection/Main";
+import ViewProfile from "./components/Profile/ViewProfile";
 import AuthPages from "./components/pages/AuthPages";
 import FeedMain from "./components/Feed/FeedMain";
 import CreatePost from "./components/Feed/createPost";
@@ -79,6 +80,7 @@ function App() {
               <Route path="/my-projects" element={<MyProjects />} />
               <Route path="/saved-projects" element={<SavedProjects />} />
               <Route path="/notifications" element={<ViewNotifications />} />
+              <Route path="/user/:clerkId" element={<ViewProfile />} />
             </Route>
 
             {/* Routes WITHOUT Layout (Navbar) */}

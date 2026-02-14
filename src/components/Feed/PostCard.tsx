@@ -146,9 +146,16 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
 
   return (
     <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-4 sm:p-4 mb-4 border border-gray-100">
+      
       {/* Author Header */}
       <div className="flex items-start justify-between mb-4 gap-2">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div
+            onClick={() => {
+              const clerkId = post.app_user?.clerkUserId;
+              if (clerkId) navigate(`/user/${clerkId}`);
+            }}
+            className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
+          >
           <div className="w-12 h-12 rounded-xl bg-linear-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white font-bold shadow-lg shrink-0">
             {post.author?.avatar ?? "?"}
           </div>
@@ -176,7 +183,13 @@ export function PostCard({ post, onVote,onDelete, onBookmark,variant = "feed" }:
 
       {/* Post Content */}
       <div className="mb-4 sm:mb-4">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 hover:text-purple-600 cursor-pointer transition line-clamp-2">
+        <h2
+          onClick={() => {
+            const clerkId = post.app_user?.clerkUserId;
+            if (clerkId) navigate(`/user/${clerkId}`);
+          }}
+          className="text-lg sm:text-xl font-bold text-gray-900 mb-2 hover:text-purple-600 cursor-pointer transition line-clamp-2"
+        >
           {post.title}
         </h2>
         <p className={`text-gray-600 leading-relaxed mb-4 sm:mb-4 text-sm sm:text-base transition-all ${expanded ? "":"line-clamp-3"}`}>
