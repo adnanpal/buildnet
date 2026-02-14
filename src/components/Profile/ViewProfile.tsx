@@ -1,7 +1,7 @@
 import  { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../api/axios";
-import { MapPin } from "lucide-react";
+import { School } from "lucide-react";
 
 export default function ViewProfile() {
   const { clerkId } = useParams<{ clerkId: string }>();
@@ -37,6 +37,7 @@ export default function ViewProfile() {
           id: p.id,
           title: p.attributes?.title ?? p.title,
           description: p.attributes?.description ?? p.description,
+          college: p.attributes?.college ?? p.college,
           status: p.attributes?.status ?? p.attributes?.statuss ?? "in-progress",
           raw: p,
         }));
@@ -69,15 +70,16 @@ export default function ViewProfile() {
         <div className="h-44 bg-linear-to-br from-purple-600 to-pink-500" />
         <div className="p-8 -mt-20">
           <div className="flex items-center gap-6">
-            <div className="w-36 h-36 rounded-xl bg-linear-to-br from-purple-600 to-pink-500 flex items-center justify-center text-white text-4xl font-extrabold border-4 border-white shadow-xl">
+            <div className="w-30 h-30 rounded-xl bg-linear-to-br from-purple-600 to-pink-500 flex items-center justify-center text-white text-4xl font-extrabold border-4 border-white shadow-xl">
               {avatar}
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-pink-500 via-red-500 to-yellow-600 bg-clip-text text-transparent  mt-10  tracking-tight">{author.name ?? profile.appUser?.username}</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-pink-500 via-red-500 to-yellow-600 bg-clip-text text-transparent  mt-12  tracking-tight">{author.name ?? profile.appUser?.username}</h2>
+              
               <p className="text-sm text-purple-600 font-medium mt-1">{author.title}</p>
               <div className="flex items-center gap-2 text-gray-600 mt-3">
-                <MapPin className="w-4 h-4" />
-                <span className="text-sm">{profile.appUser?.location ?? author.location ?? ""}</span>
+                <School className="w-4 h-4" />
+                <span className="text-sm">{author.collegeName ?? author.college ?? profile.appUser?.collegeName ?? profile.appUser?.college ?? ""}</span>
               </div>
             </div>
           </div>
