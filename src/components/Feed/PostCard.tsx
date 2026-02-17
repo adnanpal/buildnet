@@ -37,7 +37,7 @@ export interface Post {
 
 interface PostCardProps {
   post: Post;
-  onVote: (postId: number) => void;
+  onVote: (documentId: string) => void;
   onBookmark: (postId: number) => void;
   variant?: "feed" | "my-projects";
   onDelete?: (documentId: string) => void;
@@ -260,7 +260,7 @@ export function PostCard({ post, onVote, onDelete, onBookmark, variant = "feed" 
           {variant === "feed" && (
             <div className="flex items-center gap-1 sm:gap-2">
               <button
-                onClick={() => onVote(post.id)}
+                onClick={() => onVote(post.documentId)}
                 className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                   post.voted
                     ? "bg-purple-100 text-purple-700"

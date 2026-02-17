@@ -5,13 +5,15 @@ import api from "../../api/axios";
 import { toast } from "react-toastify";
 import { Bell, Users } from "lucide-react";
 import FeedNavbar from "../Feed/FeedNavbar";
+import { useNavigate } from "react-router-dom"
 
 export default function FollowRequestNotifications() {
   const { user } = useUser();
+  const navigate = useNavigate(); 
   const clerkUserId = user?.id ?? null;
   const { requests, loading, setRequests } = useConnectionRequests(clerkUserId);
 
-  const handleAccept = async (id: string) => {
+  const handleAccept = async (id: string,senderClerkUserId: string) => {
     try {
       const res = await api.put(`/api/connection-requests/${id}`, {
         data: { connectionStatus: "accepted" },
@@ -19,6 +21,9 @@ export default function FollowRequestNotifications() {
       if (res && (res.status === 200 || res.status === 204)) {
         setRequests(prev => prev.filter(r => r.id !== id));
         toast.success("Connection request accepted");
+        navigate("/chat", {
+          state: { preSelectedUserId: senderClerkUserId },
+        });
       } else {
         toast.error("Failed to accept request");
       }
@@ -99,6 +104,7 @@ export default function FollowRequestNotifications() {
                   id: req.id as string,
                   name: req.sender.name,
                   avatar: req.sender.avatar,
+                  senderClerkUserId: req.sender.clerkUserId, 
                 }}
                 onAccept={handleAccept}
                 onReject={handleReject}

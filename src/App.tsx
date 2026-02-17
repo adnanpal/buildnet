@@ -16,6 +16,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { Bounce, ToastContainer } from "react-toastify";
 import Trending from "./components/Feed/Trending";
+import Chatui from "./components/chats/Chatui";
+import ChatPage from "./components/chats/Chatpage";
 
 function App() {
 
@@ -77,7 +79,7 @@ function App() {
             {/* Routes WITH Layout (Navbar) */}
             <Route element={<Layout />}>
               <Route path="/" element={<FeedMain />} />
-              <Route path="/trending" element={<Trending />} />
+              <Route path="/trending" element={<ChatPage />} />
               <Route path="/my-projects" element={<MyProjects />} />
               <Route path="/saved-projects" element={<SavedProjects />} />
               <Route path="/notifications" element={<ViewNotifications />} />

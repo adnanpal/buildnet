@@ -6,6 +6,7 @@ export type connectionRequests = {
     sender: {
         name: string;
         avatar: string;
+        clerkUserId: string;
     };
 };
 
@@ -29,7 +30,8 @@ export default function useConnectionRequests(
                     `/api/connection-requests` +
                     `?filters[toUser][clerkUserId][$eq]=${clerkUserId}` +
                     `&filters[connectionStatus][$eq]=pending` +
-                    `&populate[fromUser][fields][0]=name`
+                    `&populate[fromUser][fields][0]=name` +
+                    `&populate[fromUser][fields][1]=clerkUserId`
                 );
 
                 console.debug("connection-requests response", res.data);
@@ -52,6 +54,12 @@ export default function useConnectionRequests(
                         fromUserRaw?.data?.attributes?.name ??
                         "Unknown";
 
+                    const senderClerkUserId =
+                        fromUserRaw?.clerkUserId ??
+                        fromUserRaw?.attributes?.clerkUserId ??
+                        fromUserRaw?.data?.attributes?.clerkUserId ??
+                        "";
+
                     const avatar =
                         fromUserRaw?.avatar ??
                         fromUserRaw?.attributes?.avatar ??
@@ -62,20 +70,21 @@ export default function useConnectionRequests(
                         sender: {
                             name,
                             avatar,
+                            clerkUserId: senderClerkUserId,
                         },
                     };
                 });
-                
+
                 setRequests(formatted);
-            }catch(err){
-                console.error("Failed To Fetch Connection Requests",err);
-            }finally{
+            } catch (err) {
+                console.error("Failed To Fetch Connection Requests", err);
+            } finally {
                 setLoading(false);
             }
         };
         fetchRequests();
 
-    },[clerkUserId]);
+    }, [clerkUserId]);
 
-    return{requests,loading,setRequests};
+    return { requests, loading, setRequests };
 }

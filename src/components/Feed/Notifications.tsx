@@ -6,8 +6,9 @@ type Props = {
     id: string;
     name: string;
     avatar?: string;
+    senderClerkUserId: string;
   };
-  onAccept: (id: string) => void;
+  onAccept: (id: string, senderClerkUserId: string) => void;
   onReject: (id: string) => void;
 };
 
@@ -25,7 +26,7 @@ export default function NotificationCard({ request, onAccept, onReject }: Props)
   const handleAccept = async () => {
     setIsProcessing(true);
     setAction("accept");
-    await onAccept(request.id);
+    await onAccept(request.id, request.senderClerkUserId);
     setIsProcessing(false);
   };
 

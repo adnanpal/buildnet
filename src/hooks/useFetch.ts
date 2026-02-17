@@ -88,14 +88,14 @@ export default function useFetch(url: string | null) {
     fetchPosts();
   }, [url]);
 
-  const handleVote = async(postId:number)=>{
+  const handleVote = async(documentId: string )=>{
     let previousPosts: Post[] = [];
 
     setPosts((prev)=>{
       previousPosts = prev;
 
       return prev.map((post)=>
-      post.id === postId?
+      post.documentId === documentId?
     {
       ...post,
       voted: !post.voted,
@@ -106,7 +106,7 @@ export default function useFetch(url: string | null) {
   });
 
   try{
-    await api.post(`/api/posts/${postId}/vote`,{
+    await api.post(`/api/posts/${documentId}/vote`,{
       vote: true,
     });
   }catch(error){
