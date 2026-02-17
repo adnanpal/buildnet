@@ -42,7 +42,7 @@ function buildRoomId(userIdA, userIdB) {
 // ─── Helper: verify connection is accepted in Strapi ─────────────────────────
 async function isConnectionAccepted(clerkUserIdA, clerkUserIdB) {
   try {
-    const STRAPI_URL = process.env.STRAPI_URL || "http://localhost:1337";
+    const STRAPI_URL = process.env.STRAPI_URL;
     const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || "";
 
     // Check if an accepted connection exists between the two users (either direction)

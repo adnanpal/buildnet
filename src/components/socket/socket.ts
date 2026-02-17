@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 
 
-const SOCKET_URL = import.meta.env.REACT_APP_SOCKET_URL;
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 
 let socket: Socket | null = null;
 

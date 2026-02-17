@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const SOCKET_SERVER = import.meta.env.VITE_SOCKET_URL || "http://localhost:4000";
+const SOCKET_SERVER = import.meta.env.VITE_SOCKET_URL;
 
 type ConnectionState = {
     accepted: boolean | null;
