@@ -13,7 +13,6 @@ import "./styles/app.css";
 import SavedProjects from "./components/Feed/SavedProjects";
 import ViewNotifications from "./components/Feed/ViewNotifications";
 import "react-toastify/dist/ReactToastify.css";
-
 import { Bounce, ToastContainer } from "react-toastify";
 import ChatPage from "./components/chats/Chatpage";
 
