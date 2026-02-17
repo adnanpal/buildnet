@@ -1,7 +1,7 @@
 import MultiSelectTags from "./MultiSelectTags";
 import SectionHeader from "./SectionHeader";
 import { Code } from "lucide-react";
-import { programmingLanguages,frameworks } from "./profileHeader";
+import { programmingLanguages, frameworks } from "./profileHeader";
 import ExperienceLevelSelector from "./ExperienceLevelSelector";
 
 interface TechnicalSkillsSectionProps {
@@ -13,12 +13,14 @@ interface TechnicalSkillsSectionProps {
   onInputChange: (field: string, value: any) => void;
   onMultiSelect: (field: "programmingLanguages" | "frameworks", value: string) => void;
 }
-function TechnicalSkillsSection({ formData, onInputChange, onMultiSelect }:TechnicalSkillsSectionProps) {
+
+function TechnicalSkillsSection({ formData, onInputChange, onMultiSelect }: TechnicalSkillsSectionProps) {
   return (
-    <div className="mb-10 border-t pt-10">
-      <SectionHeader 
-        icon={<Code className="w-6 h-6 text-green-600" />}
+    <div className="mb-2 border-t border-gray-100 pt-8">
+      <SectionHeader
+        icon={<Code className="w-5 h-5 text-green-600" />}
         title="Technical Skills"
+        subtitle="Languages, frameworks, and your experience level"
         bgColor="bg-green-100"
       />
 
@@ -32,7 +34,7 @@ function TechnicalSkillsSection({ formData, onInputChange, onMultiSelect }:Techn
         />
 
         <MultiSelectTags
-          label="Frameworks / Libraries"
+          label="Frameworks & Libraries"
           items={frameworks}
           selectedItems={formData.frameworks}
           onToggle={(value) => onMultiSelect('frameworks', value)}
@@ -47,4 +49,5 @@ function TechnicalSkillsSection({ formData, onInputChange, onMultiSelect }:Techn
     </div>
   );
 }
+
 export default TechnicalSkillsSection;

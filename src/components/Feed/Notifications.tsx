@@ -1,21 +1,19 @@
 import { useState } from "react";
+import { UserPlus, Check, X, Loader2 } from "lucide-react";
 
 type Props = {
   request: {
-    id: number;
+    id: string;
     name: string;
     avatar?: string;
   };
-  onAccept: (id: number) => void;
-  onReject: (id: number) => void;
+  onAccept: (id: string) => void;
+  onReject: (id: string) => void;
 };
 
-export default function NotificationCard({
-  request,
-  onAccept,
-  onReject,
-}: Props) {
+export default function NotificationCard({ request, onAccept, onReject }: Props) {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [action, setAction] = useState<"accept" | "reject" | null>(null);
 
   const initials = request.name
     .split(" ")
@@ -26,62 +24,70 @@ export default function NotificationCard({
 
   const handleAccept = async () => {
     setIsProcessing(true);
+    setAction("accept");
     await onAccept(request.id);
     setIsProcessing(false);
   };
 
   const handleReject = async () => {
     setIsProcessing(true);
+    setAction("reject");
     await onReject(request.id);
     setIsProcessing(false);
   };
 
   return (
-    <div className="container mx-auto mt-6 h-auto  bg-white gradient-border glassmorphism rounded-2xl 
-border-t-2 border-purple-500 shadow-purple-500/10 shadow-xl sm:h-20 lg:h-24 
-    flex items-center left-0 right-0  px-3 sm:px-4 py-3 sm:py-0">
+    <div className="hover-lift bg-white rounded-2xl border border-gray-200 px-4 sm:px-5 py-4 flex items-center gap-4">
 
-      
-      <div className="ml-0 sm:ml-2 lg:ml-4 w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 
-      rounded-full bg-linear-to-r from-purple-500 to-pink-500 
-      flex items-center justify-center shrink-0">
-        <p className="font-semibold text-white text-xs sm:text-sm lg:text-base">
-          {request.avatar ?? initials}
+      {/* Avatar */}
+      <div className="relative shrink-0">
+        <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-linear-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-sm">
+          <span className="font-bold text-white text-sm sm:text-base">
+            {request.avatar ?? initials}
+          </span>
+        </div>
+        {/* Connection icon badge */}
+        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100">
+          <UserPlus className="w-3 h-3 text-purple-600" />
+        </div>
+      </div>
+
+      {/* Message */}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm sm:text-base text-gray-800 leading-snug">
+          <span className="font-bold">{request.name}</span>
+          <span className="text-gray-500 font-normal"> sent you a connection request</span>
         </p>
       </div>
 
-      
-      <div className="font-semibold text-gray-700 ml-3 sm:ml-4 lg:ml-7 flex-1 min-w-0">
-        <p className="text-xs sm:text-sm lg:text-base truncate sm:whitespace-normal">
-          {request.name} has sent you a following request
-        </p>
-      </div>
-
-    
-      <div className="ml-2 sm:ml-6 lg:ml-10 flex gap-2 sm:gap-3 lg:gap-4 shrink-0">
+      {/* Actions */}
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Reject */}
         <button
           onClick={handleReject}
           disabled={isProcessing}
-          className="px-3 sm:px-4 lg:px-6 h-8 sm:h-9 lg:h-10 
-          rounded-lg sm:rounded-xl bg-white text-gray-500 font-semibold 
-          border border-slate-300 hover:bg-slate-50 transition 
-          disabled:opacity-50 disabled:cursor-not-allowed 
-          text-xs sm:text-sm lg:text-base"
+          title="Decline"
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 border-gray-200 bg-white text-gray-400 hover:border-red-200 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Reject
+          {isProcessing && action === "reject" ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <X className="w-4 h-4" />
+          )}
         </button>
 
+        {/* Accept */}
         <button
           onClick={handleAccept}
           disabled={isProcessing}
-          className="px-3 sm:px-4 lg:px-6 h-8 sm:h-9 lg:h-10 
-          rounded-lg sm:rounded-xl bg-linear-to-r 
-          from-purple-500 to-pink-500 text-white font-semibold 
-          shadow-md hover:opacity-90 transition 
-          disabled:opacity-50 disabled:cursor-not-allowed 
-          text-xs sm:text-sm lg:text-base"
+          title="Accept"
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-linear-to-br from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 flex items-center justify-center shadow-sm hover:shadow-md transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Accept
+          {isProcessing && action === "accept" ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Check className="w-4 h-4" />
+          )}
         </button>
       </div>
     </div>

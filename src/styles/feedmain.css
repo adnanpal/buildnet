@@ -1,110 +1,162 @@
- @keyframes slideUp {
-     from {
-         opacity: 0;
-         transform: translateY(30px);
-     }
+/* ================================================
+   Feed Main - Enhanced Animations & Utilities
+   Safe to use alongside animation.css
+   ================================================ */
 
-     to {
-         opacity: 1;
-         transform: translateY(0);
-     }
- }
+/* Slide up for feed container children */
+@keyframes slideUpItem {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
- @keyframes fadeIn {
-     from {
-         opacity: 0;
-     }
+@keyframes fadeInItem {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 
-     to {
-         opacity: 1;
-     }
- }
+@keyframes scaleInItem {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
- @keyframes scaleIn {
-     from {
-         opacity: 0;
-         transform: scale(0.9);
-     }
+/* Staggered post card entrance */
+.animate-slide-up > div {
+  animation: slideUpItem 0.45s ease-out forwards;
+  opacity: 0;
+}
 
-     to {
-         opacity: 1;
-         transform: scale(1);
-     }
- }
+.animate-fade-in {
+  animation: fadeInItem 0.4s ease-out forwards;
+}
 
- @keyframes shimmer {
-     0% {
-         background-position: -1000px 0;
-     }
+.animate-scale-in {
+  animation: scaleInItem 0.35s ease-out forwards;
+}
 
-     100% {
-         background-position: 1000px 0;
-     }
- }
+/* Reduce animation duration on mobile */
+@media (max-width: 640px) {
+  .animate-slide-up > div {
+    animation-duration: 0.3s;
+  }
+}
 
- @keyframes pulse {
+/* ================================================
+   Card hover lift (used on PostCard articles)
+   ================================================ */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.25s ease;
+}
 
-     0%,
-     100% {
-         opacity: 1;
-     }
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px -8px rgba(109, 40, 217, 0.12),
+              0 4px 12px -2px rgba(0, 0, 0, 0.06);
+  border-color: #e9d5ff;
+}
 
-     50% {
-         opacity: 0.5;
-     }
- }
+/* ================================================
+   Loading skeleton shimmer
+   ================================================ */
+@keyframes shimmerSweep {
+  0%   { background-position: -800px 0; }
+  100% { background-position:  800px 0; }
+}
 
- @keyframes bounce {
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 0%,
+    #e9eef5 40%,
+    #f1f5f9 80%
+  );
+  background-size: 800px 100%;
+  animation: shimmerSweep 1.6s ease-in-out infinite;
+  border-radius: 8px;
+}
 
-     0%,
-     100% {
-         transform: translateY(0);
-     }
+/* ================================================
+   Custom scrollbar (webkit only)
+   ================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
-     50% {
-         transform: translateY(-5px);
-     }
- }
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 4px;
+}
 
- .animate-slide-up {
-     animation: slideUp 0.6s ease-out forwards;
- }
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
 
- .animate-fade-in {
-     animation: fadeIn 0.5s ease-out;
- }
+::-webkit-scrollbar-thumb:hover {
+  background: #a78bfa;
+}
 
- .animate-scale-in {
-     animation: scaleIn 0.4s ease-out;
- }
+/* ================================================
+   Smooth scroll
+   ================================================ */
+html {
+  scroll-behavior: smooth;
+}
 
- .shimmer {
-     background: linear-gradient(90deg,
-             rgba(255, 255, 255, 0) 0%,
-             rgba(255, 255, 255, 0.4) 50%,
-             rgba(255, 255, 255, 0) 100%);
-     background-size: 1000px 100%;
-     animation: shimmer 2s infinite;
- }
+/* ================================================
+   Text truncation helpers
+   ================================================ */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
- .hover-lift {
-     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
- }
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
- .hover-lift:hover {
-     transform: translateY(-4px);
-     box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
- }
+/* ================================================
+   Focus ring for accessibility
+   ================================================ */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #9333ea;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
 
- .glass-effect {
-     background: rgba(255, 255, 255, 0.7);
-     backdrop-filter: blur(20px);
-     border: 1px solid rgba(255, 255, 255, 0.3);
- }
+/* ================================================
+   Better font rendering
+   ================================================ */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
- .gradient-text {
-     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-     -webkit-background-clip: text;
-     -webkit-text-fill-color: transparent;
-     background-clip: text;
- }
+/* ================================================
+   Larger tap targets on touch devices
+   ================================================ */
+@media (hover: none) and (pointer: coarse) {
+  button {
+    min-height: 44px;
+  }
+}

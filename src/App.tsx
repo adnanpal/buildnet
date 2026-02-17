@@ -7,14 +7,15 @@ import FeedMain from "./components/Feed/FeedMain";
 import CreatePost from "./components/Feed/createPost";
 import MyProjects from "./components/Feed/MyProjects";
 import Layout from "./components/pages/Layout";
-import Trending from "./components/Feed/Trending";
 import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 import useAppUser from "./hooks/useAppUser";
 import "./styles/app.css";
 import SavedProjects from "./components/Feed/SavedProjects";
 import ViewNotifications from "./components/Feed/ViewNotifications";
 import "react-toastify/dist/ReactToastify.css";
+
 import { Bounce, ToastContainer } from "react-toastify";
+import Trending from "./components/Feed/Trending";
 
 function App() {
 
@@ -81,6 +82,7 @@ function App() {
               <Route path="/saved-projects" element={<SavedProjects />} />
               <Route path="/notifications" element={<ViewNotifications />} />
               <Route path="/user/:clerkId" element={<ViewProfile />} />
+             
             </Route>
 
             {/* Routes WITHOUT Layout (Navbar) */}

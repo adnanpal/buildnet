@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 
 export type connectionRequests = {
-    id: number;
+    id: string; // Strapi v5 uses documentId (string) for REST routes
     sender: {
         name: string;
         avatar: string;
@@ -32,13 +32,39 @@ export default function useConnectionRequests(
                     `&populate[fromUser][fields][0]=name`
                 );
 
-                const formatted = res.data.data.map((item:any)=>({
-                    id:item.id,
-                    sender:{
-                        name: item.fromUser.name,
-                        avatar:item.fromUser.avatar ?? item.fromUser.name.charAt(0).toUpperCase(),
-                    },
-                }));
+                console.debug("connection-requests response", res.data);
+                const formatted = res.data.data.map((item: any) => {
+                    // prefer documentId (Strapi v5 REST identifier)
+                    const documentId =
+                        item.documentId ??
+                        item?.attributes?.documentId ??
+                        (item.id !== undefined ? String(item.id) : undefined);
+
+                    const fromUserRaw =
+                        item.fromUser ??
+                        item?.attributes?.fromUser ??
+                        item?.attributes?.fromUser?.data ??
+                        null;
+
+                    const name =
+                        fromUserRaw?.name ??
+                        fromUserRaw?.attributes?.name ??
+                        fromUserRaw?.data?.attributes?.name ??
+                        "Unknown";
+
+                    const avatar =
+                        fromUserRaw?.avatar ??
+                        fromUserRaw?.attributes?.avatar ??
+                        name.charAt(0).toUpperCase();
+
+                    return {
+                        id: documentId,
+                        sender: {
+                            name,
+                            avatar,
+                        },
+                    };
+                });
                 
                 setRequests(formatted);
             }catch(err){
@@ -46,9 +72,6 @@ export default function useConnectionRequests(
             }finally{
                 setLoading(false);
             }
-
-            fetchRequests();
-
         };
         fetchRequests();
 

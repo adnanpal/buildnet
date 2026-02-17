@@ -1,4 +1,4 @@
-import { Lightbulb, Bell, Plus, Menu, X, Home, TrendingUp, FolderKanban, User, LogOut, Settings, BookMarked } from 'lucide-react';
+import { Lightbulb, Bell, Plus, Menu, X, Home, FolderKanban, User, LogOut, Settings, BookMarked, MessageCircle } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useUser, useClerk } from "@clerk/clerk-react";
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +19,7 @@ export default function FeedNavbar() {
 
     const activeTab =
         location.pathname === "/" ? "feed" :
-            location.pathname === "/trending" ? "trending" :
+            location.pathname === "/trending" ? "chats" :
               location.pathname === "/saved-projects" ? "saved-projects" :
                 location.pathname.startsWith("/my-project") ? "projects" :
                     "";
@@ -105,12 +105,12 @@ export default function FeedNavbar() {
                                     </button>
                                     <button
                                         onClick={() => navigate("/trending")}
-                                        className={`nav-tab px-5 py-2 rounded-xl font-semibold transition-all ${activeTab === 'trending'
+                                        className={`nav-tab px-5 py-2 rounded-xl font-semibold transition-all ${activeTab === 'chats'
                                             ? 'active text-purple-600'
                                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                             }`}
                                     >
-                                        Trending
+                                        Chats
                                     </button>
                                     <button
                                         onClick={() => navigate("/my-projects")}
@@ -360,13 +360,13 @@ export default function FeedNavbar() {
                                             navigate("/trending");
                                             setMobileMenuOpen(false);
                                         }}
-                                        className={`menu-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition ${activeTab === 'trending'
+                                        className={`menu-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition ${activeTab === 'chats'
                                             ? 'bg-linear-to-r from-purple-100 to-blue-100 text-purple-700 font-semibold shadow-sm'
                                             : 'text-gray-700 hover:bg-gray-50'
                                             }`}
                                     >
-                                        <TrendingUp className="w-5 h-5" />
-                                        <span>Trending</span>
+                                        <MessageCircle className="w-5 h-5" />
+                                        <span>Chats</span>
                                     </button>
                                     <button
                                         onClick={() => {
