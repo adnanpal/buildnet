@@ -15,8 +15,6 @@ import ViewNotifications from "./components/Feed/ViewNotifications";
 import "react-toastify/dist/ReactToastify.css";
 
 import { Bounce, ToastContainer } from "react-toastify";
-import Trending from "./components/Feed/Trending";
-import Chatui from "./components/chats/Chatui";
 import ChatPage from "./components/chats/Chatpage";
 
 function App() {
