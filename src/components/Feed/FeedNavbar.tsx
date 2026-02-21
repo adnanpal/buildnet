@@ -19,7 +19,7 @@ export default function FeedNavbar() {
 
     const activeTab =
         location.pathname === "/" ? "feed" :
-            location.pathname === "/trending" ? "chats" :
+            location.pathname === "/messages" ? "chats" :
               location.pathname === "/saved-projects" ? "saved-projects" :
                 location.pathname.startsWith("/my-project") ? "projects" :
                     "";
@@ -104,7 +104,7 @@ export default function FeedNavbar() {
                                         Feed
                                     </button>
                                     <button
-                                        onClick={() => navigate("/trending")}
+                                        onClick={() => navigate("/messages")}
                                         className={`nav-tab px-5 py-2 rounded-xl font-semibold transition-all ${activeTab === 'chats'
                                             ? 'active text-purple-600'
                                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -357,7 +357,7 @@ export default function FeedNavbar() {
 
                                     <button
                                         onClick={() => {
-                                            navigate("/trending");
+                                            navigate("/messages");
                                             setMobileMenuOpen(false);
                                         }}
                                         className={`menu-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition ${activeTab === 'chats'

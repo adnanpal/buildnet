@@ -46,7 +46,7 @@ export default function useAppUser() {
 
                 localStorage.setItem("appUserId", newAppUserId);
                 setAppUserId(newAppUserId)
-                console.log("✅ app-user created:", createRes.data);
+                //console.log("✅ app-user created:", createRes.data);
 
                 if (!user.unsafeMetadata?.profileCompleted) {
                     await user.update({

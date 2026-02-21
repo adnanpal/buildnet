@@ -30,12 +30,12 @@ export default function useFetch(url: string | null) {
           const authorAttr = authorData?.attributes ?? authorData ?? null;
           const authorId = authorData?.id ?? attr.author?.data?.id ?? attr.author?.id ?? null;
 
-          console.log("🔍 useFetch - Full debug:", {
+          /*console.log("🔍 useFetch - Full debug:", {
             authorData,
             authorId,
             appUserData,
             appUserClerkId: appUserAttr?.clerkUserId
-          });
+          });*/
 
           return {
             id: item.id,
@@ -66,13 +66,13 @@ export default function useFetch(url: string | null) {
           };
         });
 
-        console.log("✅ useFetch - Formatted posts with app_user:",
+        /*console.log("✅ useFetch - Formatted posts with app_user:",
           formattedPosts.map(p => ({ 
             postId: p.id, 
             authorId: p.author.id,
             appUserClerkId: p.app_user?.clerkUserId 
           }))
-        );
+        );*/
 
         setPosts(formattedPosts);
         setAllPosts(formattedPosts);
@@ -140,7 +140,7 @@ export default function useFetch(url: string | null) {
 
     }catch(error){
 
-      console.error("Failed to delete post", error);
+      //console.error("Failed to delete post", error);
       toast.error("Failed to delete project ❌");
 
     }finally{

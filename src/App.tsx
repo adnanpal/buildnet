@@ -76,7 +76,7 @@ function App() {
             {/* Routes WITH Layout (Navbar) */}
             <Route element={<Layout />}>
               <Route path="/" element={<FeedMain />} />
-              <Route path="/trending" element={<ChatPage />} />
+              <Route path="/messages" element={<ChatPage />} />
               <Route path="/my-projects" element={<MyProjects />} />
               <Route path="/saved-projects" element={<SavedProjects />} />
               <Route path="/notifications" element={<ViewNotifications />} />

@@ -1,6 +1,3 @@
-// components/BuidlnetUserChat.tsx
-// Change: reads location.state.preSelectedUserId on mount and auto-selects that user
-
 import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';  // ← ADD
 import {
@@ -113,8 +110,8 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
               <div className="w-9 h-9 bg-linear-to-br from-blue-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                 {initials(currentUser.name)}
               </div>
-              <div className="hidden sm:block">
-                <h1 className="text-base font-bold text-purple-900">Buildnet Chat</h1>
+              <div>
+                <h1 className="text-base font-bold text-purple-900">{currentUser.name}</h1>
                 <p className="text-xs text-purple-500">Messages</p>
               </div>
             </div>
