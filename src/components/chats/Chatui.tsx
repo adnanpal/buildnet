@@ -6,7 +6,6 @@ import {
 } from 'lucide-react';
 import useCheckConnection from '../../hooks/Usecheckconnection';
 import useChat from '../../hooks/useChat';
-import { connectSocket } from '../socket/socket';
 
 type User = {
   id: string;
@@ -56,10 +55,6 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
     targetClerkUserId: selectedUser?.id ?? '',
     isConnected: isConnected === true,
   });
-
-  useEffect(() => {
-    connectSocket(currentUser.clerkUserId);
-  }, [currentUser.clerkUserId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

@@ -16,75 +16,14 @@ type User = {
 export default function ChatPage() {
   const { user } = useUser();
   const [connectedUsers, setConnectedUsers] = useState<User[]>([]);
-  const [socketConnected, setSocketConnected] = useState(false);
 
-  // Connect socket and track connection state
-  useEffect(() => {
-    if (!user) return;
-    
-    const socket = getSocket();
-    
-    // Set up connection/disconnect listeners only once
-    const handleConnect = () => {
-      console.log("✅ Socket connected");
-      socket.emit("register", { clerkUserId: user.id });
-      setSocketConnected(true);
-    };
-
-    const handleDisconnect = () => {
-      console.log("❌ Socket disconnected");
-      setSocketConnected(false);
-    };
-
-    socket.on("connect", handleConnect);
-    socket.on("disconnect", handleDisconnect);
-
-    // Connect if not already connected
-    if (!socket.connected) {
-      socket.connect();
-      socket.emit("register", { clerkUserId: user.id });
-      setSocketConnected(true);
-    }
-
-    return () => {
-      socket.off("connect", handleConnect);
-      socket.off("disconnect", handleDisconnect);
-    };
-  }, [user]);
-
-  // Set up online_users listener ONLY after socket is connected
-  useEffect(() => {
-    if (!socketConnected || !user) return;
-
-    const socket = getSocket();
-
-    const handleOnlineUsers = (onlineUserIds: string[]) => {
-      console.log("📡 Online users event:", onlineUserIds, "Current user:", user.id);
-      
-      // Filter out the current user from the online list
-      const otherUsersOnline = onlineUserIds.filter(id => id !== user.id);
-      
-      setConnectedUsers((prev) =>
-        prev.map((u) => ({
-          ...u,
-          status: otherUsersOnline.includes(u.id)
-            ? "online"
-            : "offline",
-        }))
-      );
-    };
-
-    socket.on("online_users", handleOnlineUsers);
-
-    return () => {
-      socket.off("online_users", handleOnlineUsers);
-    };
-  }, [socketConnected, user]);
-
+  // ─────────────────────────────────────────────
+  // FETCH CONNECTED USERS
+  // ─────────────────────────────────────────────
   useEffect(() => {
     if (!user) return;
 
-    const fetchConnected = async () => {
+    const fetchConnectedUsers = async () => {
       try {
         const [asSender, asReceiver] = await Promise.all([
           api.get(
@@ -103,54 +42,113 @@ export default function ChatPage() {
           ),
         ]);
 
-        const fromSender: User[] = asSender.data.data.map((item: any) => {
+        const fromSender = asSender.data.data.map((item: any) => {
           const u = item.toUser ?? item?.attributes?.toUser;
           return {
-            id: u?.clerkUserId ?? u?.attributes?.clerkUserId ?? "",
-            name: u?.name ?? u?.attributes?.name ?? "Unknown",
+            id: u?.clerkUserId ?? "",
+            name: u?.name ?? "Unknown",
             status: "offline" as const,
             lastSeen: null,
             unread: 0,
           };
         });
 
-        const fromReceiver: User[] = asReceiver.data.data.map((item: any) => {
+        const fromReceiver = asReceiver.data.data.map((item: any) => {
           const u = item.fromUser ?? item?.attributes?.fromUser;
           return {
-            id: u?.clerkUserId ?? u?.attributes?.clerkUserId ?? "",
-            name: u?.name ?? u?.attributes?.name ?? "Unknown",
+            id: u?.clerkUserId ?? "",
+            name: u?.name ?? "Unknown",
             status: "offline" as const,
             lastSeen: null,
             unread: 0,
           };
         });
 
-        // Deduplicate by id
         const all = [...fromSender, ...fromReceiver];
+
         const unique = all.filter(
           (u, i, arr) => u.id && arr.findIndex((x) => x.id === u.id) === i
         );
 
-        setConnectedUsers(unique);
+        // 🔥 IMPORTANT: Merge instead of overwrite
+        setConnectedUsers((prev) =>
+          unique.map((newUser) => {
+            const existing = prev.find((u) => u.id === newUser.id);
+            return existing
+              ? { ...newUser, status: existing.status }
+              : newUser;
+          })
+        );
+
+        console.log("✅ Connected users loaded:", unique.length);
       } catch (err) {
         console.error("Failed to load connected users", err);
       }
     };
 
-    fetchConnected();
+    fetchConnectedUsers();
+  }, [user]);
+
+  // ─────────────────────────────────────────────
+  // SOCKET ONLINE STATUS HANDLER
+  // ─────────────────────────────────────────────
+  useEffect(() => {
+    if (!user) return;
+
+    const socket = getSocket();
+
+    const handleOnlineUsers = (onlineUserIds: string[]) => {
+      console.log("📡 Online users:", onlineUserIds);
+
+      setConnectedUsers((prev) =>
+        prev.map((u) => ({
+          ...u,
+          status: onlineUserIds.includes(u.id)
+            ? "online"
+            : "offline",
+        }))
+      );
+    };
+
+    // Set up listener BEFORE connecting
+    socket.on("online_users", handleOnlineUsers);
+
+    // Function to register user (called on connect AND on effect mount if already connected)
+    const registerUser = () => {
+      console.log("📝 Registering user:", user.id);
+      socket.emit("register", { clerkUserId: user.id });
+    };
+
+    const handleConnect = () => {
+      console.log("🟢 Socket connected");
+      registerUser();
+    };
+
+    socket.on("connect", handleConnect);
+
+    // Connect if not connected
+    if (!socket.connected) {
+      socket.connect();
+    } else {
+      // If already connected, emit register immediately
+      registerUser();
+    }
+
+    return () => {
+      socket.off("online_users", handleOnlineUsers);
+      socket.off("connect", handleConnect);
+    };
   }, [user]);
 
   if (!user) return null;
 
   return (
-  
-      <Chatui
-        currentUser={{
-          clerkUserId: user.id,
-          name: user.fullName ?? user.username ?? "You",
-        }}
-        connectedUsers={connectedUsers}
-      />
-  
+    <Chatui
+      currentUser={{
+        clerkUserId: user.id,
+        name: user.fullName ?? user.username ?? "You",
+      }}
+      connectedUsers={connectedUsers}
+    />
   );
 }
