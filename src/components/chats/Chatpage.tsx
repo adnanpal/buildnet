@@ -78,12 +78,14 @@ export default function ChatPage() {
   if (!user) return null;
 
   return (
-    <Chatui
-      currentUser={{
-        clerkUserId: user.id,
-        name: user.fullName ?? user.username ?? "You",
-      }}
-      connectedUsers={connectedUsers}
-    />
+    <div className="h-screen overflow-hidden">
+      <Chatui
+        currentUser={{
+          clerkUserId: user.id,
+          name: user.fullName ?? user.username ?? "You",
+        }}
+        connectedUsers={connectedUsers}
+      />
+    </div>
   );
 }

@@ -60,18 +60,18 @@ export default function useChat({
     });
 
     const handleHistory = (history: ChatMessage[]) => {
-      console.log("📜 Received message history:", history.length, "messages");
+      
       setMessages(history.map((m) => ({ ...m, type: "chat" })));
     };
 
     const handleMessage = (msg: ChatMessage) => {
-      console.log("💬 Received message for roomId:", msg.roomId, "Current roomId:", roomId);
+      
       if (msg.roomId !== roomId) return;
       setMessages((prev) => [...prev, { ...msg, type: "chat" }]);
     };
 
     const handleTyping = (data: any) => {
-      console.log("📨 Received user_typing event:", data, "Current roomId:", roomId);
+      
       if (data.roomId !== roomId) {
         console.log("❌ Room ID mismatch. Event roomId:", data.roomId, "Current roomId:", roomId);
         return;
@@ -90,10 +90,10 @@ export default function useChat({
     socket.on("user_typing", handleTyping);
     socket.on("chat_error", handleError);
 
-    console.log("✅ Listeners registered for roomId:", roomId);
+    
 
     return () => {
-      console.log("🗑️ Cleaning up listeners for roomId:", roomId);
+      
       socket.off("message_history", handleHistory);
       socket.off("receive_message", handleMessage);
       socket.off("user_typing", handleTyping);
@@ -157,7 +157,7 @@ export default function useChat({
 
     typingTimeoutRef.current = setTimeout(() => {
       isTypingRef.current = false;
-      console.log("📝 Sending typing: false to targetClerkUserId:", targetClerkUserId);
+    
       socket.emit("typing", {
         clerkUserId,
         senderName,

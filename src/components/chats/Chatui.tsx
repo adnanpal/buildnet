@@ -183,10 +183,10 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
       </div>
 
       {/* ── Chat Area ────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col h-full min-w-0">
 
         {/* Header */}
-        <div className="h-14 sm:h-16 bg-white/80 border-b border-purple-200 backdrop-blur-sm flex items-center justify-between px-3 sm:px-6">
+        <div className="h-14 sm:h-16 bg-white/80 border-b border-purple-200 backdrop-blur-sm flex items-center justify-between px-3 sm:px-6 shrink-0">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <button className="md:hidden p-2 hover:bg-purple-100 rounded-lg" onClick={() => setSidebarOpen(!sidebarOpen)}>
               {sidebarOpen ? <X size={20} className="text-purple-600" /> : <Menu size={20} className="text-purple-600" />}
@@ -219,8 +219,9 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
 
         {sidebarOpen && <div className="fixed inset-0 bg-black/20 md:hidden z-30" onClick={() => setSidebarOpen(false)} />}
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
+        {/* Messages - Scrollable Container */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4">
+          <div className="max-w-4xl mx-auto w-full flex flex-col gap-3 sm:gap-4">
 
           {!selectedUser && (
             <div className="flex items-center justify-center h-full text-sm text-purple-300">
@@ -256,13 +257,13 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
               {messages.map((msg) => {
                 const isMine = msg.senderId === currentUser.clerkUserId;
                 return (
-                  <div key={msg._id} className={`flex gap-3 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold text-white ${isMine ? 'bg-linear-to-br from-blue-600 to-pink-500' : 'bg-linear-to-br from-purple-500 to-pink-500'}`}>
+                  <div key={msg._id} className={`flex gap-2 sm:gap-3 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <div className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold text-white ${isMine ? 'bg-linear-to-br from-blue-600 to-pink-500' : 'bg-linear-to-br from-purple-500 to-pink-500'}`}>
                       {isMine ? initials(currentUser.name) : initials(msg.senderName)}
                     </div>
-                    <div className={`flex flex-col gap-1 max-w-xs sm:max-w-sm md:max-w-md ${isMine ? 'items-end' : 'items-start'}`}>
-                      <div className={`px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-sm ${isMine ? 'bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-tr-sm' : 'bg-white text-purple-900 border border-purple-200 rounded-tl-sm'}`}>
-                        <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                    <div className={`flex flex-col gap-1 w-full sm:w-auto max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl ${isMine ? 'items-end' : 'items-start'}`}>
+                      <div className={`px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-sm break-all overflow-hidden ${isMine ? 'bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-tr-sm' : 'bg-white text-purple-900 border border-purple-200 rounded-tl-sm'}`}>
+                        <p className="leading-relaxed whitespace-pre-wrap word-break">{msg.text}</p>
                       </div>
                       <span className="text-xs text-purple-400 px-1">{formatTime(msg.timestamp)}</span>
                     </div>
@@ -271,12 +272,12 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
               })}
 
               {typingUser && (
-                <div className="flex gap-3">
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white bg-linear-to-br from-purple-500 to-pink-500">
+                <div className="flex gap-2 sm:gap-3 items-end animate-in fade-in duration-300">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold text-white bg-linear-to-br from-purple-500 to-pink-500">
                     {initials(typingUser)}
                   </div>
-                  <div className="px-4 py-2.5 rounded-2xl rounded-tl-sm bg-white border border-purple-200">
-                    <div className="flex gap-1">
+                  <div className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl rounded-tl-sm bg-white border border-purple-200 shadow-sm">
+                    <div className="flex gap-1 items-center">
                       <div className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" />
                       <div className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
                       <div className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
@@ -293,14 +294,15 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
             </div>
           )}
           <div ref={messagesEndRef} />
+          </div>
         </div>
 
         {/* Input */}
-        <div className="border-t border-purple-200 bg-white/80 backdrop-blur-sm p-3 sm:p-4">
+        <div className="border-t border-purple-200 bg-white/80 backdrop-blur-sm p-2 sm:p-3 md:p-4 shrink-0">
           <div className="max-w-4xl mx-auto">
             {isConnected === true ? (
-              <div className="flex gap-2 items-end">
-                <button className="p-2 hover:bg-purple-100 rounded-lg text-purple-600 shrink-0 hidden sm:block">
+              <div className="flex gap-1.5 sm:gap-2 items-end">
+                <button className="p-2 hover:bg-purple-100 rounded-lg text-purple-600 shrink-0 hidden sm:block transition-colors">
                   <Paperclip size={18} />
                 </button>
                 <textarea
@@ -309,20 +311,20 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
                   onKeyPress={handleKeyPress}
                   placeholder={`Message ${selectedUser?.name ?? ''}…`}
                   rows={1}
-                  className="flex-1 px-4 py-2.5 bg-white border border-purple-200 rounded-xl text-sm text-purple-900 placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none min-h-11 max-h-32"
+                  className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-purple-200 rounded-xl text-sm text-purple-900 placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none min-h-10 sm:min-h-11 max-h-24 sm:max-h-32 transition-all"
                   onInput={(e) => {
                     const t = e.target as HTMLTextAreaElement;
                     t.style.height = 'auto';
                     t.style.height = Math.min(t.scrollHeight, 128) + 'px';
                   }}
                 />
-                <button className="p-2 hover:bg-purple-100 rounded-lg text-purple-600 shrink-0 hidden sm:block">
+                <button className="p-2 hover:bg-purple-100 rounded-lg text-purple-600 shrink-0 hidden sm:block transition-colors">
                   <Smile size={18} />
                 </button>
                 <button
                   onClick={handleSend}
                   disabled={!inputValue.trim()}
-                  className="px-4 py-2.5 bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white rounded-xl transition-all flex items-center justify-center shrink-0"
+                  className="p-2 sm:px-4 sm:py-2.5 bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white rounded-xl transition-all flex items-center justify-center shrink-0"
                 >
                   <Send size={17} />
                 </button>
