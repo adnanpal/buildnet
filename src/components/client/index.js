@@ -100,7 +100,7 @@ io.on("connection", (socket) => {
 
   // Join a private chat room — GUARDED by Strapi connection check
   socket.on("join_chat", async ({ clerkUserId, senderName, targetClerkUserId }) => {
-    console.log(`🔄 join_chat event received: ${senderName} (${clerkUserId}) chatting with ${targetClerkUserId}`);
+  
 
     if (socket.data.currentRoom){
       console.log(`👋 Leaving previous room: ${socket.data.currentRoom}`);
@@ -109,7 +109,7 @@ io.on("connection", (socket) => {
     const accepted = await isConnectionAccepted(clerkUserId, targetClerkUserId);
 
     if (!accepted) {
-      console.log(`❌ Connection not accepted between ${clerkUserId} and ${targetClerkUserId}`);
+      
       socket.emit("chat_error", {
         message: "You can only chat with accepted connections.",
       });
@@ -127,7 +127,7 @@ io.on("connection", (socket) => {
     const history = await Message.find({ roomId }).sort({ timestamp: 1 }).limit(100);
     socket.emit("message_history", history);
 
-    console.log(`💬 ${senderName} joined room ${roomId}`);
+   
   });
 
   // Send a message — also re-checked so it can't be bypassed
@@ -163,9 +163,9 @@ io.on("connection", (socket) => {
 
   // Typing indicator
   socket.on("typing", ({ clerkUserId, senderName, targetClerkUserId, isTyping }) => {
-    console.log(`🎹 Received typing event: ${senderName} (${isTyping ? 'typing' : 'stopped typing'})`);
+ 
     const roomId = buildRoomId(clerkUserId, targetClerkUserId);
-    console.log(`📤 Broadcasting user_typing to room: ${roomId}, isTyping: ${isTyping}`);
+   
     socket.to(roomId).emit("user_typing", { senderName, isTyping, roomId });
   });
 
