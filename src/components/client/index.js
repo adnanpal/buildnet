@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import axios from "axios";
-import { on } from "events";
+
 dotenv.config();
 
 const app = express();
@@ -34,6 +34,13 @@ const messageSchema = new mongoose.Schema({
 });
 const Message = mongoose.model("Message", messageSchema);
 
+const presenceSchema = new mongoose.Schema({
+  clerkUserId: { type: String, required: true, unique: true },
+  lastSeen: { type: Date, default: null },
+});
+
+const Presence = mongoose.model("Presence", presenceSchema);
+
 // ─── Helper: build a stable roomId from two clerkUserIds ─────────────────────
 // Sorting ensures A↔B and B↔A produce the same room
 function buildRoomId(userIdA, userIdB) {
@@ -47,6 +54,7 @@ async function isConnectionAccepted(clerkUserIdA, clerkUserIdB) {
     const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || "";
 
     // Check if an accepted connection exists between the two users (either direction)
+    // Proper AND grouping: (A→B) OR (B→A)
     const res = await axios.get(
       `${STRAPI_URL}/api/connection-requests` +
       `?filters[$or][0][fromUser][clerkUserId][$eq]=${clerkUserIdA}` +
@@ -57,7 +65,6 @@ async function isConnectionAccepted(clerkUserIdA, clerkUserIdB) {
       `&pagination[limit]=1`,
       { headers: { Authorization: `Bearer ${STRAPI_TOKEN}` } }
     );
-
     return res.data?.data?.length > 0;
   } catch (err) {
     console.error("Strapi connection check failed:", err.message);
@@ -86,8 +93,18 @@ app.get("/check-connection", async (req, res) => {
   res.json({ accepted, roomId: accepted ? buildRoomId(userA, userB) : null });
 });
 
+app.get("/presence/:userId", async (req, res) => {
+  try {
+    const record = await Presence.findOne({ clerkUserId: req.params.userId });
+    res.json({ lastSeen: record?.lastSeen });
+
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch presence" });
+  }
+});
+
 // ─── Socket.IO ────────────────────────────────────────────────────────────────
- // clerkUserId → socket.id
+// clerkUserId → socket.id
 const onlineUsers = {} // clerkUserId -> socket.id
 
 io.on("connection", (socket) => {
@@ -179,7 +196,7 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit("user_typing", { senderName, isTyping, roomId });
   });
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect", async () => {
     const userId = socket.data.clerkUserId;
     if (!userId) return;
 
@@ -187,6 +204,13 @@ io.on("connection", (socket) => {
 
     if (onlineUsers[userId]?.size === 0) {
       delete onlineUsers[userId];
+
+      //save lastseen in db
+      await Presence.findOneAndUpdate(
+        { clerkUserId: userId },
+        { lastSeen: new Date() },
+        { upsert: true }
+      );
     }
 
     console.log(`👋 User disconnected: ${userId}`);

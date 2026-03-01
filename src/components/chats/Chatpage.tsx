@@ -28,19 +28,21 @@ export default function ChatPage() {
         const [asSender, asReceiver] = await Promise.all([
           api.get(
             `/api/connection-requests` +
-              `?filters[fromUser][clerkUserId][$eq]=${user.id}` +
-              `&filters[connectionStatus][$eq]=accepted` +
-              `&populate[toUser][fields][0]=name` +
-              `&populate[toUser][fields][1]=clerkUserId`
+            `?filters[fromUser][clerkUserId][$eq]=${user.id}` +
+            `&filters[connectionStatus][$eq]=accepted` +
+            `&populate[toUser][fields][0]=name` +
+            `&populate[toUser][fields][1]=clerkUserId`
           ),
           api.get(
             `/api/connection-requests` +
-              `?filters[toUser][clerkUserId][$eq]=${user.id}` +
-              `&filters[connectionStatus][$eq]=accepted` +
-              `&populate[fromUser][fields][0]=name` +
-              `&populate[fromUser][fields][1]=clerkUserId`
+            `?filters[toUser][clerkUserId][$eq]=${user.id}` +
+            `&filters[connectionStatus][$eq]=accepted` +
+            `&populate[fromUser][fields][0]=name` +
+            `&populate[fromUser][fields][1]=clerkUserId`
           ),
         ]);
+
+
 
         const fromSender = asSender.data.data.map((item: any) => {
           const u = item.toUser ?? item?.attributes?.toUser;
@@ -70,12 +72,37 @@ export default function ChatPage() {
           (u, i, arr) => u.id && arr.findIndex((x) => x.id === u.id) === i
         );
 
+
+        const usersWithPresence = await Promise.all(
+          unique.map(async (u) => {
+            try {
+              const res = await fetch(
+                `${import.meta.env.VITE_SOCKET_URL}/presence/${u.id}`
+              );
+              const data = await res.json();
+
+              return {
+                ...u,
+                lastSeen: data.lastSeen,
+              };
+            } catch {
+              return u;
+            }
+          })
+        );
+
+
+
         // 🔥 IMPORTANT: Merge instead of overwrite
         setConnectedUsers((prev) =>
-          unique.map((newUser) => {
+          usersWithPresence.map((newUser) => {
             const existing = prev.find((u) => u.id === newUser.id);
+
             return existing
-              ? { ...newUser, status: existing.status }
+              ? {
+                ...newUser,
+                status: existing.status,
+              }
               : newUser;
           })
         );
@@ -98,18 +125,17 @@ export default function ChatPage() {
     const socket = getSocket();
 
     const handleOnlineUsers = (onlineUserIds: string[]) => {
-      console.log("📡 Online users:", onlineUserIds);
-
       setConnectedUsers((prev) =>
-        prev.map((u) => ({
-          ...u,
-          status: onlineUserIds.includes(u.id)
-            ? "online"
-            : "offline",
-        }))
+        prev.map((u) => {
+          const isOnline = onlineUserIds.includes(u.id);
+
+          return {
+            ...u,
+            status: isOnline ? "online" : "offline",
+          };
+        })
       );
     };
-
     // Set up listener BEFORE connecting
     socket.on("online_users", handleOnlineUsers);
 

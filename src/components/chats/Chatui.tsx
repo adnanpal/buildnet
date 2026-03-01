@@ -24,29 +24,42 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
   const location = useLocation();
 
   const preSelectedId = (location.state as any)?.preSelectedUserId ?? null;
-
-  const defaultUser =
-    connectedUsers.find((u) => u.id === preSelectedId) ??
-    (connectedUsers.length > 0 ? connectedUsers[0] : null);
-
-  const [selectedUser, setSelectedUser] = useState<User | null>(defaultUser);
-  const [searchQuery, setSearchQuery]   = useState('');
-  const [inputValue, setInputValue]     = useState('');
-  const [sidebarOpen, setSidebarOpen]   = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
- 
+
+  const selectedUser = connectedUsers.find(
+    (u) => u.id === selectedUserId
+  ) ?? null;
+
 
   useEffect(() => {
-    if (!preSelectedId) return;
-    const found = connectedUsers.find((u) => u.id === preSelectedId);
-    if (found) setSelectedUser(found);
-  }, [connectedUsers, preSelectedId]);
+    if (!connectedUsers.length) return;
+
+    if (selectedUserId) {
+      const exists = connectedUsers.find(u => u.id === selectedUserId);
+      if (!exists) {
+        setSelectedUserId(null);
+      }
+      return;
+    }
+
+    if (preSelectedId) {
+      const found = connectedUsers.find(u => u.id === preSelectedId);
+      if (found) setSelectedUserId(found.id);
+      return;
+    }
+
+    setSelectedUserId(connectedUsers[0].id);
+  }, [connectedUsers]);
 
 
 
   const { accepted: isConnected } = useCheckConnection(
     currentUser.clerkUserId,
-    selectedUser?.id ?? null
+    selectedUserId
   );
 
   const { messages, typingUser, chatError, sendMessage, emitTyping } = useChat({
@@ -70,16 +83,16 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
-  
+
 
   const formatTime = (date: Date | string) => {
     const d = new Date(date);
     const diff = Date.now() - d.getTime();
     const mins = Math.floor(diff / 60000);
-    const hrs  = Math.floor(diff / 3600000);
-    if (mins < 1)  return 'Just now';
-    if (hrs  < 1)  return `${mins}m ago`;
-    if (hrs  < 24) return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const hrs = Math.floor(diff / 3600000);
+    if (mins < 1) return 'Just now';
+    if (hrs < 1) return `${mins}m ago`;
+    if (hrs < 24) return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
@@ -92,6 +105,8 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
   const filtered = connectedUsers.filter((u) =>
     u.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+
 
   return (
     /*
@@ -171,7 +186,7 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
           {filtered.map((u) => (
             <button
               key={u.id}
-              onClick={() => { setSelectedUser(u); setSidebarOpen(false); }}
+              onClick={() => { setSelectedUserId(u.id); setSidebarOpen(false); }}
               className={`
                 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5 text-left
                 transition-all duration-150 group
@@ -208,7 +223,11 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
                 <p className="text-xs text-slate-400 truncate mt-0.5">
                   {u.status === 'online' ? (
                     <span className="text-emerald-500 font-medium">Online</span>
-                  ) : u.lastSeen}
+                  ) : u.lastSeen ? (
+                    formatTime(u.lastSeen)
+                  ) : (
+                    "Offline"
+                  )}
                 </p>
               </div>
             </button>
@@ -257,7 +276,9 @@ export default function BuidlnetUserChat({ currentUser, connectedUsers }: Props)
                     {isConnected === null
                       ? 'Checking connection…'
                       : isConnected
-                        ? selectedUser.status === 'online' ? 'Online · can message' : 'Connected · can message'
+                        ? selectedUser.status === 'online' ? 'Online · can message' : selectedUser.lastSeen
+                          ? `Last Seen ${formatTime(selectedUser.lastSeen)}`
+                          : "Offline"
                         : '⚠️ Not connected'}
                   </p>
                 </div>
