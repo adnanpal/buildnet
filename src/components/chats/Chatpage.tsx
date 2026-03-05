@@ -1,6 +1,6 @@
 // src/pages/ChatPage.tsx
 import { useUser } from "@clerk/clerk-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../../api/axios";
 import Chatui from "../chats/Chatui";
 import { getSocket } from "../socket/socket";
@@ -16,6 +16,8 @@ type User = {
 export default function ChatPage() {
   const { user } = useUser();
   const [connectedUsers, setConnectedUsers] = useState<User[]>([]);
+  const [usersLoaded, setUsersLoaded] = useState(false);
+  const socketStatusRef = useRef<Map<string, "online" | "offline">>(new Map());
 
   // ─────────────────────────────────────────────
   // FETCH CONNECTED USERS
@@ -41,8 +43,6 @@ export default function ChatPage() {
             `&populate[fromUser][fields][1]=clerkUserId`
           ),
         ]);
-
-
 
         const fromSender = asSender.data.data.map((item: any) => {
           const u = item.toUser ?? item?.attributes?.toUser;
@@ -72,7 +72,6 @@ export default function ChatPage() {
           (u, i, arr) => u.id && arr.findIndex((x) => x.id === u.id) === i
         );
 
-
         const usersWithPresence = await Promise.all(
           unique.map(async (u) => {
             try {
@@ -91,22 +90,32 @@ export default function ChatPage() {
           })
         );
 
+        // 🔥 IMPORTANT: Set initial user list but preserve existing socket status
+        // Only update if users haven't been loaded yet
+        setConnectedUsers((prev) => {
+          if (prev.length > 0) {
+            // Merge: keep socket status, update lastSeen
+            return usersWithPresence.map((newUser) => {
+              const existing = prev.find((u) => u.id === newUser.id);
+              // Use socket ref as source of truth for online status
+              const socketStatus = socketStatusRef.current.get(newUser.id);
+              const status = (socketStatus || existing?.status || "offline") as "online" | "offline";
+              
+              return existing
+                ? {
+                    ...newUser,
+                    status,
+                    unread: existing.unread,
+                  }
+                : newUser;
+            });
+          } else {
+            // First load: set users as offline, socket will update status
+            return usersWithPresence;
+          }
+        });
 
-
-        // 🔥 IMPORTANT: Merge instead of overwrite
-        setConnectedUsers((prev) =>
-          usersWithPresence.map((newUser) => {
-            const existing = prev.find((u) => u.id === newUser.id);
-
-            return existing
-              ? {
-                ...newUser,
-                status: existing.status,
-              }
-              : newUser;
-          })
-        );
-
+        setUsersLoaded(true);
         console.log("✅ Connected users loaded:", unique.length);
       } catch (err) {
         console.error("Failed to load connected users", err);
@@ -125,18 +134,33 @@ export default function ChatPage() {
     const socket = getSocket();
 
     const handleOnlineUsers = (onlineUserIds: string[]) => {
-      setConnectedUsers((prev) =>
-        prev.map((u) => {
+      console.log("📡 Received online users from socket:", onlineUserIds);
+      
+      // Track socket status in ref (this won't trigger re-renders)
+      socketStatusRef.current.clear();
+      onlineUserIds.forEach(id => {
+        socketStatusRef.current.set(id, "online");
+      });
+      
+      setConnectedUsers((prev) => {
+        const updated = prev.map((u) => {
           const isOnline = onlineUserIds.includes(u.id);
-
+          const statusChanged = u.status !== (isOnline ? "online" : "offline");
+          if (statusChanged) {
+            console.log(
+              `👤 ${u.name} status: ${u.status} → ${isOnline ? "online" : "offline"}`
+            );
+          }
           return {
             ...u,
-            status: isOnline ? "online" : "offline",
+            status: isOnline ? ("online" as const) : ("offline" as const),
           };
-        })
-      );
+        });
+        return updated;
+      });
     };
-    // Set up listener BEFORE connecting
+
+    // Set up listener BEFORE connecting (this ensures we catch all broadcasts)
     socket.on("online_users", handleOnlineUsers);
 
     // Function to register user (called on connect AND on effect mount if already connected)
@@ -148,21 +172,36 @@ export default function ChatPage() {
     const handleConnect = () => {
       console.log("🟢 Socket connected");
       registerUser();
+
+      // Fallback: Request online users after a short delay to ensure we have it
+      const timer = setTimeout(() => {
+        console.log("⏰ Sending request_online_users as fallback");
+        socket.emit("request_online_users");
+      }, 500);
+
+      return () => clearTimeout(timer);
+    };
+
+    const handleConnectError = (error: Error) => {
+      console.error("❌ Socket connection error:", error);
     };
 
     socket.on("connect", handleConnect);
+    socket.on("connect_error", handleConnectError);
 
     // Connect if not connected
     if (!socket.connected) {
+      console.log("🔌 Starting socket connection...");
       socket.connect();
     } else {
-      // If already connected, emit register immediately
+      console.log("🔌 Socket already connected, registering user");
       registerUser();
     }
 
     return () => {
       socket.off("online_users", handleOnlineUsers);
       socket.off("connect", handleConnect);
+      socket.off("connect_error", handleConnectError);
     };
   }, [user]);
 
