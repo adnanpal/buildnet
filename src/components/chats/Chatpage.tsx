@@ -16,7 +16,7 @@ type User = {
 export default function ChatPage() {
   const { user } = useUser();
   const [connectedUsers, setConnectedUsers] = useState<User[]>([]);
-  const [usersLoaded, setUsersLoaded] = useState(false);
+  const [, setUsersLoaded] = useState(false);
   const socketStatusRef = useRef<Map<string, "online" | "offline">>(new Map());
 
   // ─────────────────────────────────────────────
