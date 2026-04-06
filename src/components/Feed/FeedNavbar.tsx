@@ -87,7 +87,7 @@ export default function FeedNavbar() {
                                         <Lightbulb className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                                     </div>
                                     <span className="text-xl sm:text-2xl lg:text-3xl font-bold bg-linear-to-r from-purple-600 via-purple-500 to-blue-600 bg-clip-text text-transparent">
-                                        BuildNet
+                                        CodeAlliance
                                     </span>
                                 </div>
 
