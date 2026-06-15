@@ -11,7 +11,7 @@ function Footer() {
               <div className="bg-linear-to-r from-purple-600 to-blue-600 p-2 rounded-lg">
                 <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <span className="text-lg sm:text-xl font-bold">BuildNet</span>
+              <span className="text-lg sm:text-xl font-bold">CodeAlliance</span>
             </div>
             <p className="text-sm sm:text-base text-gray-400">
               Empowering innovators to collaborate and build amazing projects together.
@@ -51,7 +51,7 @@ function Footer() {
 
         {/* Copyright */}
         <div className="border-t border-gray-800 pt-6 sm:pt-8 text-center text-gray-400 text-xs sm:text-sm">
-          © 2026 BuildNet. Made with ❤️ by Adnan Pal
+          © 2026 CodeAlliance. Made with ❤️ by Fardin Unnen
         </div>
       </div>
     </footer>

@@ -16,11 +16,11 @@ export function getSocket(): Socket {
   return socket;
 }
 
-export function connectSocket(clerkUserId: string) {
+export function connectSocket(_clerkUserId?: string) {
   const s = getSocket();
   if (!s.connected) {
     s.connect();
-    s.emit("register", { clerkUserId });
+    // The registration will happen in the connect event listener in ChatPage.tsx
   }
 }
 

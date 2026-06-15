@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import axios from "axios";
+
 dotenv.config();
 
 const app = express();
@@ -25,13 +26,20 @@ mongoose
 
 // ─── Message Schema ───────────────────────────────────────────────────────────
 const messageSchema = new mongoose.Schema({
-  roomId:    { type: String, required: true, index: true },
-  senderId:  { type: String, required: true },  // clerkUserId
-  senderName:{ type: String, required: true },
-  text:      { type: String, required: true },
+  roomId: { type: String, required: true, index: true },
+  senderId: { type: String, required: true },  // clerkUserId
+  senderName: { type: String, required: true },
+  text: { type: String, required: true },
   timestamp: { type: Date, default: Date.now },
 });
 const Message = mongoose.model("Message", messageSchema);
+
+const presenceSchema = new mongoose.Schema({
+  clerkUserId: { type: String, required: true, unique: true },
+  lastSeen: { type: Date, default: null },
+});
+
+const Presence = mongoose.model("Presence", presenceSchema);
 
 // ─── Helper: build a stable roomId from two clerkUserIds ─────────────────────
 // Sorting ensures A↔B and B↔A produce the same room
@@ -46,17 +54,17 @@ async function isConnectionAccepted(clerkUserIdA, clerkUserIdB) {
     const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || "";
 
     // Check if an accepted connection exists between the two users (either direction)
+    // Proper AND grouping: (A→B) OR (B→A)
     const res = await axios.get(
       `${STRAPI_URL}/api/connection-requests` +
-        `?filters[$or][0][fromUser][clerkUserId][$eq]=${clerkUserIdA}` +
-        `&filters[$or][0][toUser][clerkUserId][$eq]=${clerkUserIdB}` +
-        `&filters[$or][1][fromUser][clerkUserId][$eq]=${clerkUserIdB}` +
-        `&filters[$or][1][toUser][clerkUserId][$eq]=${clerkUserIdA}` +
-        `&filters[connectionStatus][$eq]=accepted` +
-        `&pagination[limit]=1`,
+      `?filters[$or][0][fromUser][clerkUserId][$eq]=${clerkUserIdA}` +
+      `&filters[$or][0][toUser][clerkUserId][$eq]=${clerkUserIdB}` +
+      `&filters[$or][1][fromUser][clerkUserId][$eq]=${clerkUserIdB}` +
+      `&filters[$or][1][toUser][clerkUserId][$eq]=${clerkUserIdA}` +
+      `&filters[connectionStatus][$eq]=accepted` +
+      `&pagination[limit]=1`,
       { headers: { Authorization: `Bearer ${STRAPI_TOKEN}` } }
     );
-
     return res.data?.data?.length > 0;
   } catch (err) {
     console.error("Strapi connection check failed:", err.message);
@@ -85,24 +93,50 @@ app.get("/check-connection", async (req, res) => {
   res.json({ accepted, roomId: accepted ? buildRoomId(userA, userB) : null });
 });
 
+app.get("/presence/:userId", async (req, res) => {
+  try {
+    const record = await Presence.findOne({ clerkUserId: req.params.userId });
+    res.json({ lastSeen: record?.lastSeen });
+
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch presence" });
+  }
+});
+
 // ─── Socket.IO ────────────────────────────────────────────────────────────────
-const connectedUsers = {}; // clerkUserId → socket.id
+// clerkUserId → socket.id
+const onlineUsers = {} // clerkUserId -> socket.id
 
 io.on("connection", (socket) => {
   console.log(`🔌 Socket connected: ${socket.id}`);
 
   // Register user so we can track who is online
   socket.on("register", ({ clerkUserId }) => {
-    connectedUsers[clerkUserId] = socket.id;
     socket.data.clerkUserId = clerkUserId;
-    console.log(`👤 Registered: ${clerkUserId}`);
+
+    if (!onlineUsers[clerkUserId]) {
+      onlineUsers[clerkUserId] = new Set();
+    }
+
+    onlineUsers[clerkUserId].add(socket.id);
+
+    // Broadcast online users to all clients (each client will filter themselves out)
+    io.emit("online_users", Object.keys(onlineUsers));
+    console.log(`📡 Broadcasted online users:`, Object.keys(onlineUsers));
   });
 
   // Join a private chat room — GUARDED by Strapi connection check
   socket.on("join_chat", async ({ clerkUserId, senderName, targetClerkUserId }) => {
+
+
+    if (socket.data.currentRoom) {
+      console.log(`👋 Leaving previous room: ${socket.data.currentRoom}`);
+      socket.leave(socket.data.currentRoom);
+    }
     const accepted = await isConnectionAccepted(clerkUserId, targetClerkUserId);
 
     if (!accepted) {
+
       socket.emit("chat_error", {
         message: "You can only chat with accepted connections.",
       });
@@ -112,14 +146,15 @@ io.on("connection", (socket) => {
     const roomId = buildRoomId(clerkUserId, targetClerkUserId);
     socket.join(roomId);
     socket.data.clerkUserId = clerkUserId;
-    socket.data.senderName  = senderName;
+    socket.data.senderName = senderName;
     socket.data.currentRoom = roomId;
+    console.log(`✅ ${senderName} successfully joined room ${roomId}`);
 
     // Send message history
     const history = await Message.find({ roomId }).sort({ timestamp: 1 }).limit(100);
     socket.emit("message_history", history);
 
-    console.log(`💬 ${senderName} joined room ${roomId}`);
+
   });
 
   // Send a message — also re-checked so it can't be bypassed
@@ -137,32 +172,50 @@ io.on("connection", (socket) => {
 
     const message = await Message.create({
       roomId,
-      senderId:   clerkUserId,
+      senderId: clerkUserId,
       senderName,
-      text:       text.trim(),
-      timestamp:  new Date(),
+      text: text.trim(),
+      timestamp: new Date(),
     });
 
     io.to(roomId).emit("receive_message", {
-      _id:        message._id,
-      roomId:     message.roomId,
-      senderId:   message.senderId,
+      _id: message._id,
+      roomId: message.roomId,
+      senderId: message.senderId,
       senderName: message.senderName,
-      text:       message.text,
-      timestamp:  message.timestamp,
+      text: message.text,
+      timestamp: message.timestamp,
     });
   });
 
   // Typing indicator
   socket.on("typing", ({ clerkUserId, senderName, targetClerkUserId, isTyping }) => {
+
     const roomId = buildRoomId(clerkUserId, targetClerkUserId);
-    socket.to(roomId).emit("user_typing", { senderName, isTyping });
+
+    socket.to(roomId).emit("user_typing", { senderName, isTyping, roomId });
   });
 
-  socket.on("disconnect", () => {
-    const uid = socket.data.clerkUserId;
-    if (uid) delete connectedUsers[uid];
-    console.log(`🔴 Disconnected: ${socket.id}`);
+  socket.on("disconnect", async () => {
+    const userId = socket.data.clerkUserId;
+    if (!userId) return;
+
+    onlineUsers[userId]?.delete(socket.id);
+
+    if (onlineUsers[userId]?.size === 0) {
+      delete onlineUsers[userId];
+
+      //save lastseen in db
+      await Presence.findOneAndUpdate(
+        { clerkUserId: userId },
+        { lastSeen: new Date() },
+        { upsert: true }
+      );
+    }
+
+    console.log(`👋 User disconnected: ${userId}`);
+    io.emit("online_users", Object.keys(onlineUsers));
+    console.log(`📡 Updated online users after disconnect:`, Object.keys(onlineUsers));
   });
 });
 

@@ -152,7 +152,7 @@ export default function FeedMain() {
 
             {/* Sidebar */}
             <aside className="lg:col-span-4">
-              <div className="sticky top-6">
+              <div className="sticky top-4">
                 <FeedSidebar />
               </div>
             </aside>

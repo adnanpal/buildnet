@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 interface NavbarProp{
   brand?:string;
 }
-export default function Navbar({brand="BuildNet"}:NavbarProp) {
+export default function Navbar({brand="CodeAlliance"}:NavbarProp) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
